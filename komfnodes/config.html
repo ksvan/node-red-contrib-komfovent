@@ -1,0 +1,33 @@
+<script type="text/javascript">
+    RED.nodes.registerType('komfoventConfig',
+    {
+        category: 'config',
+        defaults: {
+            displayName: {value:"Komfovent unit"},
+            site_name: {value:"Home"},
+            ip: {value:"192.168.1.3",required:true} 
+        },
+        credentials: {
+            username: {value:"sure",required:true},
+            password: {value:"1234",required:true},
+        },
+        label: function() {
+            return 'komfoventConfig';
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="komfoventConfig">
+    <div class="form-row">
+        <label for="node-config-input-username"><i class="icon-bookmark"></i> Username </label>
+        <input type="text" id="node-config-input-username">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-password"><i class="icon-bookmark"></i> Password</label>
+        <input type="text" id="node-config-input-password">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-ip"><i class="icon-bookmark"></i> IP-address</label>
+        <input type="text" id="node-config-input-ip">
+    </div>
+</script>
