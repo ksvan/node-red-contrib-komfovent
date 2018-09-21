@@ -1,0 +1,8 @@
+.eslint*
+package-lock.json
+*debug*
+*sample*
+node-modules/
+node_modules
+*sublime*
+.DS_Store
