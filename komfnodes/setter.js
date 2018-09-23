@@ -68,7 +68,7 @@ module.exports = function (RED) {
           }); // komfomode end
           node.send(msg);
         }
-      }); // komfologonend
+      }); // komfologon end
     }); // this on.input end
   }
 
@@ -78,10 +78,9 @@ module.exports = function (RED) {
     // remove this debug before push/use/publish/deploy
     request.post({
       url: 'http://' + node.komfoUser.ip,
-      jar: true,
       host: node.komfoUser.ip,
       method: 'POST',
-      headers: {},
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
       body: '1=' + node.komfoUser.credentials.username + '&' + '2=' + node.komfoUser.credentials.password
     }, function (err, result, body) {
       node.debug('Komfovent -  logon result - Error ' + err);
@@ -111,11 +110,10 @@ module.exports = function (RED) {
   function komfoMode (mode, node, msg, call) {
     node.debug('Payload start function ' + mode.code);
     request.post({
-      url: 'http://' + node.komfoUser.ip, // + '/ajax.xml',
-      jar: true,
+      url: 'http://' + node.komfoUser.ip + '/ajax.xml',
       host: node.komfoUser.ip,
       method: 'POST',
-      headers: {},
+      headers: { 'connection': 'keep-alive', 'content-type': 'text/plain' },
       body: mode.code
     }, function (err, result, body) {
       node.debug('Komfovent - set-mode result - Error ' + err);
