@@ -1,11 +1,13 @@
 module.exports = function (RED) {
   'use strict';
   var request = require('request');
+
   function komfoventNode (config) {
     RED.nodes.createNode(this, config);
 
     // initial config of the node  ///
     var node = this;
+
     // Retrieve the config node
     try {
       this.komfoUser = RED.nodes.getNode(config.user);
@@ -76,6 +78,8 @@ module.exports = function (RED) {
   function komfoLogon (node, msg, call) {
     node.debug('Payload start of logon: ' + msg.payload);
     // remove this debug before push/use/publish/deploy
+    node.debug('Komfovent password---' + node.komfoUser.credentials.username + '---\n\r');
+    node.debug('Komfovent password---' + node.komfoUser.credentials.password + '---\n\r');
     request.post({
       url: 'http://' + node.komfoUser.ip,
       host: node.komfoUser.ip,
@@ -95,12 +99,13 @@ module.exports = function (RED) {
       }
       else if (result.body.indexOf('Incorrect password!') >= 0) {
         node.warn('Komfovent - wrong password for unit');
-        // node.debug('Komfovent return: ' + body);
+        node.debug('Komfovent return: ' + result.body);
+        
         return call({ error: true, result: 'wrong password ', unit: node.komfoUser.ip });
       }
       else {
         // for now, assuimg this means we're logged on
-        node.debug('Komfovent - got logon result back');
+        node.debug('Komfovent - got logon result back - success');
         return call({ error: false, result: 'logged on', unit: node.komfoUser.ip });
       }
     });
@@ -113,7 +118,7 @@ module.exports = function (RED) {
       url: 'http://' + node.komfoUser.ip + '/ajax.xml',
       host: node.komfoUser.ip,
       method: 'POST',
-      headers: { 'connection': 'keep-alive', 'content-type': 'text/plain' },
+      headers: { 'connection': 'keep-alive', 'content-type': 'text/plain;charset=UTF-8', 'origin': 'http://' + node.komfoUser.ip },
       body: mode.code
     }, function (err, result, body) {
       node.debug('Komfovent - set-mode result - Error ' + err);
