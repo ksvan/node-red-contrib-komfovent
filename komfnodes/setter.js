@@ -86,7 +86,7 @@ module.exports = function (RED) {
       method: 'POST',
       headers: { 'content-type': 'application/x-www-form-urlencoded' },
       body: '1=' + node.komfoUser.credentials.username + '&' + '2=' + node.komfoUser.credentials.password
-    }, function (err, result, body) {
+    }, function (err, result) {
       node.debug('Komfovent -  logon result - Error ' + err);
       // node.debug('komfovent result is in komfo - Body ' + result.body)
       if (err) {
@@ -120,7 +120,7 @@ module.exports = function (RED) {
       method: 'POST',
       headers: { 'connection': 'keep-alive', 'content-type': 'text/plain;charset=UTF-8', 'origin': 'http://' + node.komfoUser.ip },
       body: mode.code
-    }, function (err, result, body) {
+    }, function (err, result) {
       node.debug('Komfovent - set-mode result - Error ' + err);
       // node.debug('komfovent result is in komfo - Body ' + result.body)
       if (err) {
