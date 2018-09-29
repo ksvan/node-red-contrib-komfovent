@@ -82,11 +82,11 @@ module.exports = function (RED) {
     node.debug('Komfovent password---' + node.komfoUser.credentials.password + '---\n\r');
     request.post({
       url: 'http://' + node.komfoUser.ip,
-      host: node.komfoUser.ip,
-      method: 'POST',
-      headers: { 'content-type': 'application/x-www-form-urlencoded' },
-      body: '1=' + node.komfoUser.credentials.username + '&' + '2=' + node.komfoUser.credentials.password
-    }, function (err, result) {
+      Host: node.komfoUser.ip,
+      Method: 'POST',
+      Headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      form: '1=' + node.komfoUser.credentials.username + '&' + '2=' + node.komfoUser.credentials.password
+    }, function (err, result, body) {
       node.debug('Komfovent -  logon result - Error ' + err);
       // node.debug('komfovent result is in komfo - Body ' + result.body)
       if (err) {
@@ -97,10 +97,9 @@ module.exports = function (RED) {
           return call({ error: true, result: JSON.stringify(err), unit: node.komfoUser.ip });
         }
       }
-      else if (result.body.indexOf('Incorrect password!') >= 0) {
+      else if (body.indexOf('Incorrect password!') >= 0) {
         node.warn('Komfovent - wrong password for unit');
         node.debug('Komfovent return: ' + result.body);
-        
         return call({ error: true, result: 'wrong password ', unit: node.komfoUser.ip });
       }
       else {
@@ -116,10 +115,10 @@ module.exports = function (RED) {
     node.debug('Payload start function ' + mode.code);
     request.post({
       url: 'http://' + node.komfoUser.ip + '/ajax.xml',
-      host: node.komfoUser.ip,
-      method: 'POST',
-      headers: { 'connection': 'keep-alive', 'content-type': 'text/plain;charset=UTF-8', 'origin': 'http://' + node.komfoUser.ip },
-      body: mode.code
+      Host: node.komfoUser.ip,
+      Method: 'POST',
+      Headers: { 'Connection': 'Keep-Alive', 'Content-Type': 'text/plain;charset=UTF-8', 'Origin': 'http://' + node.komfoUser.ip },
+      Body: mode.code
     }, function (err, result) {
       node.debug('Komfovent - set-mode result - Error ' + err);
       // node.debug('komfovent result is in komfo - Body ' + result.body)
