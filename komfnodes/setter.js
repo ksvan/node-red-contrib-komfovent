@@ -1,6 +1,6 @@
 module.exports = function (RED) {
   'use strict';
-  var request = require('request');
+  var request;
 
   function komfoventNode (config) {
     RED.nodes.createNode(this, config);
@@ -30,6 +30,8 @@ module.exports = function (RED) {
       // validate input, right mode and lookup code
       var pay = msg.payload;
       var mode = { name: 'auto', code: '285=2' };
+      request = require('request');
+
       mode.name = pay;
       switch (pay) {
         case 'away':
@@ -80,12 +82,13 @@ module.exports = function (RED) {
     // remove this debug before push/use/publish/deploy
     node.debug('Komfovent password---' + node.komfoUser.credentials.username + '---\n\r');
     node.debug('Komfovent password---' + node.komfoUser.credentials.password + '---\n\r');
+    var logonBody = '1=' + node.komfoUser.credentials.username + '&' + '2=' + node.komfoUser.credentials.password;
     request.post({
       url: 'http://' + node.komfoUser.ip,
-      Host: node.komfoUser.ip,
-      Method: 'POST',
-      Headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      form: '1=' + node.komfoUser.credentials.username + '&' + '2=' + node.komfoUser.credentials.password
+      // host: node.komfoUser.ip,
+      // headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Origin': 'http://' + node.komfoUser.ip },
+      headers: { 'Content-Length': logonBody.length },
+      body: logonBody
     }, function (err, result, body) {
       node.debug('Komfovent -  logon result - Error ' + err);
       // node.debug('komfovent result is in komfo - Body ' + result.body)
@@ -115,10 +118,11 @@ module.exports = function (RED) {
     node.debug('Payload start function ' + mode.code);
     request.post({
       url: 'http://' + node.komfoUser.ip + '/ajax.xml',
-      Host: node.komfoUser.ip,
-      Method: 'POST',
-      Headers: { 'Connection': 'Keep-Alive', 'Content-Type': 'text/plain;charset=UTF-8', 'Origin': 'http://' + node.komfoUser.ip },
-      Body: mode.code
+      // host: node.komfoUser.ip,
+      // method: 'POST',
+      // headers: { 'Connection': 'Keep-Alive', 'Content-Type': 'text/plain;charset=UTF-8', 'Origin': 'http://' + node.komfoUser.ip },
+      headers: { 'Content-Length': mode.code.length },
+      body: mode.code
     }, function (err, result) {
       node.debug('Komfovent - set-mode result - Error ' + err);
       // node.debug('komfovent result is in komfo - Body ' + result.body)
@@ -134,7 +138,7 @@ module.exports = function (RED) {
       else {
         // for now assuming this means mode has been set
         node.debug('Komfovent setmode return status: ' + result.statusCode);
-        node.debug('Komfovent set mode - retuned body \n\r' + result.body);
+        node.debug('Komfovent set mode - returned body \n\r' + result.body);
         return call({ error: false, result: mode.name, unit: node.komfoUser.ip });
       }
     });
