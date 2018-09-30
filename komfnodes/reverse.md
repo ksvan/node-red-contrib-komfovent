@@ -1,4 +1,5 @@
 # History file, reversing and working out Komfovent integration
+My own documentation of results during reversing, sniffing, trial and error. 
 
 ## Logon - what seems to work best
 Komfovent built in webserver for controller C6.
@@ -6,15 +7,13 @@ Komfovent built in webserver for controller C6.
 ### Confirmed working for logon
 	request.post({
       url: 'http://' + node.komfoUser.ip,
-      host: node.komfoUser.ip,
-      method: 'POST',
-      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      headers: { 'Content-Length': 17 },
       body: '1=' + node.komfoUser.credentials.username + '&' + '2=' + node.komfoUser.credentials.password
     },
 
 Komfovent seems to require Host to be present.
-Content-type seems to vary, especially the ajax calls are a bit different (naturally)
-
+Content-type seems to vary, especially the ajax calls are a bit different (naturally). But seems to work best without setting the headers.
+Content-Length though seems to be case sensitive and should come before	host and other headers...
 
 ### Switching modes for komfovent
 This is done by reusing the ajax calls made by the webclient, towards a file at root called ajax.xml
@@ -29,14 +28,13 @@ Commands are simple payloads, form look a like formatting.
 	3=2 or 285=2
 285 is the automode, which in the webserver is handled as a toggle switch. Calling it once will set in Auto mode, twice will reset to the last fan mode before auto. 
 
-Traffic towards ajax.xml seems to be expected to have host header set, content type of text/plain and connection keep-alive
+Traffic towards ajax.xml seems to be expected to have host header set, content type of text/plain and connection keep-alive. But seems to be more stable without any other headers set in request() than case sensitive Content-Length
 
 #### Current setup - not working
 
 	request.post({
       url: 'http://' + node.komfoUser.ip + '/ajax.xml',
-      host: node.komfoUser.ip,
-      method: 'POST',
-      headers: { 'connection': 'keep-alive', 'content-type': 'text/plain' },
+      // headers: { 'Connection': 'Keep-Alive', 'Content-Type': 'text/plain;charset=UTF-8', 'Origin': 'http://' + node.komfoUser.ip },
+      headers: { 'Content-Length': mode.code.length },
       body: mode.code
-    }, 
+    } 
