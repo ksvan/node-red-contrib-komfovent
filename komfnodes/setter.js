@@ -79,14 +79,9 @@ module.exports = function (RED) {
   // function purely for handling logon
   function komfoLogon (node, msg, call) {
     node.debug('Payload start of logon: ' + msg.payload);
-    // remove this debug before push/use/publish/deploy
-    node.debug('Komfovent password---' + node.komfoUser.credentials.username + '---\n\r');
-    node.debug('Komfovent password---' + node.komfoUser.credentials.password + '---\n\r');
     var logonBody = '1=' + node.komfoUser.credentials.username + '&' + '2=' + node.komfoUser.credentials.password;
     request.post({
       url: 'http://' + node.komfoUser.ip,
-      // host: node.komfoUser.ip,
-      // headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Origin': 'http://' + node.komfoUser.ip },
       headers: { 'Content-Length': logonBody.length },
       body: logonBody
     }, function (err, result, body) {
@@ -118,9 +113,6 @@ module.exports = function (RED) {
     node.debug('Payload start function ' + mode.code);
     request.post({
       url: 'http://' + node.komfoUser.ip + '/ajax.xml',
-      // host: node.komfoUser.ip,
-      // method: 'POST',
-      // headers: { 'Connection': 'Keep-Alive', 'Content-Type': 'text/plain;charset=UTF-8', 'Origin': 'http://' + node.komfoUser.ip },
       headers: { 'Content-Length': mode.code.length },
       body: mode.code
     }, function (err, result) {
