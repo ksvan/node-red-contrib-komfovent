@@ -87,5 +87,9 @@ In automode, the system will alter fanspeed based on either sensors or the weekl
 
 Please note that timeouts can be long for wrong or not reachable hosts, as this would be defined by the OS TCP/IP timeout settings.
 
+# Legal Disclaimer
+
+This software is not affiliated with Komfovent and the developers take no legal responsibility for the functionality or security of your ventilation systems and devices. Neither does any of the contributers/dependecies to this package. Treat your credentials with the uthermost care.
+
 
 
