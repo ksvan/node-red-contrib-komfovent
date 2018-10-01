@@ -30,7 +30,7 @@ Commands are simple payloads, form look a like formatting.
 
 Traffic towards ajax.xml seems to be expected to have host header set, content type of text/plain and connection keep-alive. But seems to be more stable without any other headers set in request() than case sensitive Content-Length
 
-#### Current setup - not working
+#### Current setup - working
 
 	request.post({
       url: 'http://' + node.komfoUser.ip + '/ajax.xml',
