@@ -38,7 +38,7 @@ module.exports = function (RED) {
           getPage(node, function (result, body) {
             if (!result.err) {
               body = scrape.load(body);
-              msg.payload = body('ai0').text();
+              msg.payload = body('#ai0').text();
               node.send(msg);
             }
             else {
