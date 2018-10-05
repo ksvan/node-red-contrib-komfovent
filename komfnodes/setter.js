@@ -77,8 +77,7 @@ module.exports = function (RED) {
   }
 
   // function purely for handling logon
-  function komfoLogon (node, msg, call) {
-    node.debug('Payload start of logon: ' + msg.payload);
+  function komfoLogon (node, call) {
     var logonBody = '1=' + node.komfoUser.credentials.username + '&' + '2=' + node.komfoUser.credentials.password;
     request.post({
       url: 'http://' + node.komfoUser.ip,

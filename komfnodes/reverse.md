@@ -38,3 +38,8 @@ Traffic towards ajax.xml seems to be expected to have host header set, content t
       headers: { 'Content-Length': mode.code.length },
       body: mode.code
     } 
+
+
+## Scraping info from the page
+
+

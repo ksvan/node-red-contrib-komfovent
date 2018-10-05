@@ -6,15 +6,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Addedd
-- Screen scraping of key values and settings (getter node)
+- Screen scraping of key values and settings (getter node) (implies new dependency, Cherio)
 - Supporting more specific modes with timeouts
 
 ### Changed
 - Moving to promises requests
 
+## [0.3.0] UNRELEASED
+
+### Added
+- Adding getter node, fetch data from page
+- Added getter node html interface node red
+
+### Changed
+- Changed komfologon method, no need to pass on msg object anymore 
+- Added more reverse engineering info - reverse.md
+
 ## [0.2.0]
 ### Addedd
-- mode switching feature
+- mode switching feature 
 
 ## Fixed
 - Logon instability issues

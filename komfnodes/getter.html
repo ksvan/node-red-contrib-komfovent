@@ -1,0 +1,33 @@
+<script type="text/javascript">
+    RED.nodes.registerType('komfoventNodeGet',{
+        category: 'function',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""},
+            user: {value:"",type:"komfoventConfig", required:true}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "file.png",
+        label: function() {
+            return this.name||"komfoventNodeGet";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="komfoventNodeGet">
+    <div class="form-row">
+        <label for="node-input-user"><i class="icon-tag"></i> Credentials </label>
+        <input type="text" id="node-input-user" placeholder="user">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name </label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="komfoventNodeGet">
+    <p>This nodes let get values from the Komfovent controller. The node interacts with the unit using http/ajax.</p>
+    <p>msg.payload must be set to the wanted field/value to fetch</p>
+    <p>Node will return the value if success, or error otherwise</p>
+</script>
