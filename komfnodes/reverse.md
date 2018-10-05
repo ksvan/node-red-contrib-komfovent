@@ -46,6 +46,12 @@ Commands are simple payloads, form look a like formatting.
 
 Traffic towards ajax.xml seems to be expected to have host header set, content type of text/plain and connection keep-alive. But seems to be more stable without any other headers set in request() than case sensitive Content-Length
 
+#### Modes with timeouts
+These modes are only accepting a timeout value in minutes as the value. 283 is fireplace
+
+	283=80
+This would activate Fireplace for 80 minutes.
+
 #### Current setup - working
 
 	request.post({
@@ -70,6 +76,8 @@ The page calls ajax.xml to post changes.
 - c_cfg2.html is the settings page for operation controls.
 
 ### ID, Field names
+Not all fields are in the same page, which parsers like cheerios have issues with. Main page of komfovent uses several iframes.
+In general, all fields without underscores seems to be available on main page (current hypotheses)
 
 #### Temperature and heating
 - ai0 is supply temperature
