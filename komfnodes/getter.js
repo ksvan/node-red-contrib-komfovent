@@ -1,7 +1,7 @@
 module.exports = function (RED) {
   'use strict';
   var request;
-  var scrape;
+  var scraper;
   var logon;
 
   function komfoventNodeGet (config) {
@@ -28,24 +28,32 @@ module.exports = function (RED) {
     // what to do with payload incoming ///
     this.on('input', function (msg) {
       request = require('request');
-      scrape = require('cheerio');
+      scraper = require('cheerio');
+      var msgResult = 't';
       komfoLogon(node, function (result) {
         if (result.error) {
           node.debug('Komfovent getnode error logon');
-          return;
         } else {
-          var body;
+          var scraped;
           getPage(node, function (result, body) {
             if (!result.err) {
-              body = scrape.load(body);
-              msg.payload = body('#ai0').text();
-              node.send(msg);
+              scraped = scraper.load(body);
+              msgResult = scraped('#' + msg.payload).text().trim();
+
+              if (typeof msgResult === 'undefined' || !msgResult || msgResult === '') {
+                node.warn('Error, id not found: ' + msg.payload + ' Result: ' + msgResult + '  typeof: ' + typeof msgResult);
+              }
+              else {
+                msg.payload = msgResult;
+                node.send(msg);
+              }
             }
             else {
-              node.warn('error fetching page');
+              node.warn('error fetching page: http://' + node.komfoUser.ip);
             }
           });
         }
+        return;
       });
     });// end this.on
   } // end komfovent node get
