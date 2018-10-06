@@ -29,12 +29,12 @@ module.exports = function (RED) {
     this.on('input', function (msg) {
       request = require('request');
       scraper = require('cheerio');
-      var msgResult = 't';
+      let msgResult = 't';
       komfoLogon(node, function (result) {
         if (result.error) {
           node.debug('Komfovent getnode error logon');
         } else {
-          var scraped;
+          let scraped;
           getPage(node, function (result, body) {
             if (!result.err) {
               scraped = scraper.load(body);

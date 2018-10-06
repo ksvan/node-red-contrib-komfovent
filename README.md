@@ -1,7 +1,7 @@
 
 # Node-red-contrib-komfovent
 This package contains nodes to work with Komfovent ventilation units, mainly with the C6 controller with built in webserver.
-The node supports the (way too basic) web auth for this unit and uses the ajax calls to integrate.
+The node supports the (way too basic) web auth for this unit and uses the ajax calls to integrate. Currently support for changing modes and fetching status/metric/sensor data.
 
 This package is by no means associated with or supported by the actual vendor of the ventilation units, but should be perfectly safe to use, as it only replicates the exact actions of the web based controller.
 
@@ -47,6 +47,37 @@ Return values are either the mode if success, or the error returned. (add error 
 
 Result can also be stringified error object from Request.post, on errors not handled specifically by this node.
 
+## KomfoventNodeGet (get data)
+This is the node for fetching status and metrics available from the web page of the controller. 
+
+### Input and results
+The node takes a string as input, id of the datafield wanted. You can get a list of the most common below or use dev tools or view source of komfovent to find the IDs you want. However, please note that the scraper being used, Cheerios, does not support iframes. So IDs found here will not be extracted as of now. Food for future releases.
+
+	msg.payload = 'ai0' // would return string value of supply temp
+
+### Field names
+
+#### Temperature and environment
+- ai0 is supply temperature
+- ai1 is extract temperature
+- ai2 is outdoor temperature
+- rh is relative humidity in percentage
+
+#### Heating
+- ec2 is heat recovery measurement
+- ec4 is current heating power in watts
+- ec1 is current heat exchanger effecieny in %
+- ec7d is kWh spent on heating for current day. ec7m is for month and ec7t total
+
+#### System metrics
+- fcg is filter clogging level %
+- ec3 is current power consumption
+- ec8d is recovered energy in kWh current day. ec8m for month, ec8t total
+- ec6d is consumed energy in kWh for the day. ec6m for month and ec6t for total
+
+#### Pressure
+- saf is suppy flow in percentage
+- eaf is extract airflow in percentage
 
 ## Future
 Add support for more modes (fireplace, kitchen ventilation etc)
@@ -91,9 +122,15 @@ In automode, the system will alter fanspeed based on either sensors or the weekl
 
 Please note that timeouts can be long for wrong or not reachable hosts, as this would be defined by the OS TCP/IP timeout settings.
 
+## Networking
+The C6 controller only supports physical ethernet connection, the rj45 to be found inside the unit, with specific channels to lead the cable through.
+A wireless bridge can then be attached and get the unit on your wifi. From experience, these ventilation units are often placed in non-hospitable areas of buildings, that can become very damp, warm, cold etc. Make sure your electricity and wifi bridge is up the the job.
+
+Another trick is to connect the bridge to power by using for instance a fibaro plug. Then its quite easy to reset the device in case of issues, avoding having to crawl into the attic or wherever your ventilation unit is placed.
+
 # Legal Disclaimer
 
-This software is not affiliated with Komfovent and the developers take no legal responsibility for the functionality or security of your ventilation systems and devices. Neither does any of the contributers/dependecies to this package. Treat your credentials with the uthermost care.
+This software is not affiliated with Komfovent and the developers take no legal responsibility for the functionality or security of your ventilation systems and devices. Neither does any of the contributers/dependecies to this package. Treat your credentials with the uthermost care and do not change settings you do not understand on the ventilation unit. Ethernet connection should only be set up like described in the manual.
 
 
 
