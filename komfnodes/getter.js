@@ -2,7 +2,6 @@ module.exports = function (RED) {
   'use strict';
   var request;
   var scraper;
-  var logon;
 
   function komfoventNodeGet (config) {
     RED.nodes.createNode(this, config);
@@ -30,9 +29,15 @@ module.exports = function (RED) {
       request = require('request');
       scraper = require('cheerio');
       let msgResult = 't';
+      if (typeof msg.payload !== 'string' || !msg.payload || msg.payload === '') {
+        node.warn('Komfovent - empty ID received, quitting');
+        return;
+      }
       komfoLogon(node, function (result) {
         if (result.error) {
-          node.debug('Komfovent getnode error logon');
+          node.debug('Komfovent getNode error logging on');
+          msg.payload = result;
+          node.send(msg);
         } else {
           let scraped;
           getPage(node, function (result, body) {
@@ -41,15 +46,17 @@ module.exports = function (RED) {
               msgResult = scraped('#' + msg.payload).text().trim();
 
               if (typeof msgResult === 'undefined' || !msgResult || msgResult === '') {
-                node.warn('Error, id not found: ' + msg.payload + ' Result: ' + msgResult + '  typeof: ' + typeof msgResult);
+                node.warn('Error, id not found: ' + msg.payload);
+                node.send({ error: true, result: 'id not found', unit: node.komfoUser.ip });
               }
               else {
-                msg.payload = msgResult;
+                // seems like we got the data without errors
+                msg.payload = { error: false, result: msgResult, unit: node.komfoUser.ip };
                 node.send(msg);
               }
             }
             else {
-              node.warn('error fetching page: http://' + node.komfoUser.ip);
+              node.warn('Komfovent error fetching page: http://' + node.komfoUser.ip);
             }
           });
         }
@@ -67,11 +74,11 @@ module.exports = function (RED) {
     function (err, result, body) {
       node.debug('Komfovent -  logon result - Error ' + err);
       if (!err) {
-        return call(result,body);
+        return call(result, body);
       }
       else {
         node.warn('Error getting page');
-        return call(result,body);
+        return call({ error: true, result: JSON.stringify(err), unit: node.komfoUser.ip });
       }
     });
   }

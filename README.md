@@ -43,7 +43,7 @@ Return values are either the mode if success, or the error returned. (add error 
 
 	{ error: true, result: 'wrong password', unit: 192.168.x.x }
 	{ error: false, result: 'auto', unit: 192.168.x.x }
-	{ error: false, result: '16.6', unit: 192.168.x.x } // (future release with property extraction, ie outside temperature etc)
+	{ error: false, result: '16.6', unit: 192.168.x.x } 
 
 Result can also be stringified error object from Request.post, on errors not handled specifically by this node.
 
@@ -54,6 +54,12 @@ This is the node for fetching status and metrics available from the web page of 
 The node takes a string as input, id of the datafield wanted. You can get a list of the most common below or use dev tools or view source of komfovent to find the IDs you want. However, please note that the scraper being used, Cheerios, does not support iframes. So IDs found here will not be extracted as of now. Food for future releases.
 
 	msg.payload = 'ai0' // would return string value of supply temp
+
+Please note that as of now, return values includes the type, the unit the value is set in, as defined in the web page. And the same capitalization.
+
+	{ error: false, result: '16.6 C', unit: 192.168.x.x } 
+	{ error: false, result: 'BOOST', unit: 192.168.x.x } 
+	{ error: false, result: '40 %', unit: 192.168.x.x } 
 
 ### Field names
 
@@ -80,10 +86,11 @@ The node takes a string as input, id of the datafield wanted. You can get a list
 - eaf is extract airflow in percentage
 
 ## Future
-Add support for more modes (fireplace, kitchen ventilation etc)
-Future plan is to add getting the values from the unit as well, but that kind of screen scraping isn't to motivating...
-Surfarcing the actual commands sent in the config node might also be relevant in the future.
+Add support for more modes also with timers(fireplace, kitchen ventilation etc)
+Surfarcing the actual commands sent in the config node might also be relevant in the future, making them available for change by configuration.
+For scraping, adding support to fetch which modes and controls are activated, other than actual fanspeed.
 Maybe adding support for specifically handling the modes implemented as toggle switches (auto, eco) and remove the toggle issue of the controller. But this has multiple quality/troubleshooting implications and would require scraping actual data from the controller first.
+
 
 ## Handling toggle switches
 Auto and eco mode is toggling the modes when called. If you call it once, auto mode is activated. Twice, and it falls back to last known standard mode (away, normal etc). This can be handled quite easily in node-red. Make a global context variable tracking if you have called it or not and use a switch or function node to implement your logic. My function node for this in an earlier implementation:
@@ -126,7 +133,9 @@ Please note that timeouts can be long for wrong or not reachable hosts, as this 
 The C6 controller only supports physical ethernet connection, the rj45 to be found inside the unit, with specific channels to lead the cable through.
 A wireless bridge can then be attached and get the unit on your wifi. From experience, these ventilation units are often placed in non-hospitable areas of buildings, that can become very damp, warm, cold etc. Make sure your electricity and wifi bridge is up the the job.
 
-Another trick is to connect the bridge to power by using for instance a fibaro plug. Then its quite easy to reset the device in case of issues, avoding having to crawl into the attic or wherever your ventilation unit is placed.
+Another trick is to connect the bridge to power by using for instance a fibaro plug. Then its quite easy to reset the device in case of issues, avoding having to crawl into the attic or wherever your ventilation unit is placed. 
+
+Komfovent C6 also seems to throw Connection reset once in a while, at least when I do dev and log on often. Recieve ECONRESET or EPIPE CLOSED.
 
 # Legal Disclaimer
 
