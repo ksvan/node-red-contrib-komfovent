@@ -47,7 +47,7 @@ Commands are simple payloads, form look a like formatting.
 Traffic towards ajax.xml seems to be expected to have host header set, content type of text/plain and connection keep-alive. But seems to be more stable without any other headers set in request() than case sensitive Content-Length
 
 #### Modes with timeouts
-These modes are only accepting a timeout value in minutes as the value. 283 is fireplace
+These modes are only accepting a timeout value in minutes as the value. 283 is fireplace, 282 is kitchen ventilator mitigation
 
 	283=80
 This would activate Fireplace for 80 minutes.
@@ -61,11 +61,21 @@ This would activate Fireplace for 80 minutes.
       body: mode.code
     } 
 
+### Modes
+
+	var mode = {
+      home: '3=2',
+      away: '3=1',
+      auto: '285=2',
+      intensive: '3=3',
+      boost: '3=4',
+      fireplace: '283',
+      kitchen: '282'
+    };
 
 ## Scraping info from the page
 Komfovent C6 controller webpage isnt very human readable formatted, but at least there is unique IDs for key elements to adress them when scraping.
 To get the main page, you just get the root of the webserver again after logon.
-
 
 The page calls ajax.xml to post changes. 
 - i.asp seems to be the one outputting the values, in sort of an xml format for key details like pressure, indoor temp etc.
@@ -88,7 +98,6 @@ In general, all fields without underscores seems to be available on main page (c
 - ec4 is current heating power in watts
 - ec1 is current heat exchanger effecieny in %
 - ec7d is kWh spent on heating for current day. ec7m is for month and ec7t total
-
 
 #### Pressure
 - saf is suppy flow in percentage

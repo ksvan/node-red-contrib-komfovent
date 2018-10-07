@@ -53,7 +53,7 @@ This is the node for fetching status and metrics available from the web page of 
 ### Input and results
 The node takes a string as input, id of the datafield wanted. You can get a list of the most common below or use dev tools or view source of komfovent to find the IDs you want. However, please note that the scraper being used, Cheerios, does not support iframes. So IDs found here will not be extracted as of now. Food for future releases.
 
-	msg.payload = 'ai0' // would return string value of supply temp
+	msg.payload = 'ai0' // would return string value of supply temp, in the json object shown below
 
 Please note that as of now, return values includes the type, the unit the value is set in, as defined in the web page. And the same capitalization.
 

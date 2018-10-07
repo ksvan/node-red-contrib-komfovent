@@ -85,7 +85,6 @@ module.exports = function (RED) {
       body: logonBody
     }, function (err, result, body) {
       node.debug('Komfovent -  logon result - Error ' + err);
-      // node.debug('komfovent result is in komfo - Body ' + result.body)
       if (err) {
         node.warn('Komfovent - Problem logging on komfovent: ' + JSON.stringify(err));
         if (err.errno === 'ENOTFOUND' || err.errno === 'EHOSTDOWN') {

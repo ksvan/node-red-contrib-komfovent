@@ -33,21 +33,22 @@ module.exports = function (RED) {
         node.warn('Komfovent - empty ID received, quitting');
         return;
       }
-      komfoLogon(node, function (result) {
-        if (result.error) {
+      komfoLogon(node, function (resultLogon) {
+        if (resultLogon.error) {
           node.debug('Komfovent getNode error logging on');
-          msg.payload = result;
+          msg.payload = resultLogon;
           node.send(msg);
         } else {
           let scraped;
-          getPage(node, function (result, body) {
-            if (!result.err) {
+          getPage(node, function (resultGetPage, body) {
+            if (!resultGetPage.error && body !== '') {
               scraped = scraper.load(body);
               msgResult = scraped('#' + msg.payload).text().trim();
 
               if (typeof msgResult === 'undefined' || !msgResult || msgResult === '') {
                 node.warn('Error, id not found: ' + msg.payload);
-                node.send({ error: true, result: 'id not found', unit: node.komfoUser.ip });
+                msg.payload = { error: true, result: 'id not found', unit: node.komfoUser.ip };
+                node.send(msg);
               }
               else {
                 // seems like we got the data without errors
@@ -78,12 +79,12 @@ module.exports = function (RED) {
       }
       else {
         node.warn('Error getting page');
-        return call({ error: true, result: JSON.stringify(err), unit: node.komfoUser.ip });
+        return call({ error: true, result: JSON.stringify(err), unit: node.komfoUser.ip }, '');
       }
     });
   }
 
-  // function purely for handling logon
+  // function purely for handling logon (yes, currently duplicated from setter.js)
   function komfoLogon (node, call) {
     var logonBody = '1=' + node.komfoUser.credentials.username + '&' + '2=' + node.komfoUser.credentials.password;
     request.post({
@@ -92,7 +93,6 @@ module.exports = function (RED) {
       body: logonBody
     }, function (err, result, body) {
       node.debug('Komfovent -  logon result - Error ' + err);
-      // node.debug('komfovent result is in komfo - Body ' + result.body)
       if (err) {
         node.warn('Komfovent - Problem logging on komfovent: ' + JSON.stringify(err));
         if (err.errno === 'ENOTFOUND' || err.errno === 'EHOSTDOWN') {
