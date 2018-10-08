@@ -3,8 +3,8 @@
     {
         category: 'config',
         defaults: {
-            displayName: {value:"Komfovent unit"},
-            site_name: {value:"Home"},
+            displayName: {value:''},
+            siteName: {value:''},
             ip: {value:"192.168.1.3",required:true} 
         },
         credentials: {
@@ -12,12 +12,20 @@
             password: {value:"",required:true},
         },
         label: function() {
-            return 'komfoventConfig';
+            return this.displayName||'komfoventConfig';
         }
     });
 </script>
 
 <script type="text/x-red" data-template-name="komfoventConfig">
+    <div class="form-row">
+        <label for="node-config-input-displayName"><i class="icon-tag"></i> Name </label>
+        <input type="text" id="node-config-input-displayName" placeholder="displayName">
+    </div>
+    <div class="form-row">
+        <label for="node-input-siteName"><i class="icon-tag"></i> Name </label>
+        <input type="text" id="node-input-siteName" placeholder="siteName">
+    </div>
     <div class="form-row">
         <label for="node-config-input-username"><i class="icon-bookmark"></i> Username </label>
         <input type="text" id="node-config-input-username">

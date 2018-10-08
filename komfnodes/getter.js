@@ -40,7 +40,9 @@ module.exports = function (RED) {
           node.send(msg);
         } else {
           let scraped;
-          getPage(node, function (resultGetPage, body) {
+          let page = '';
+          if (msg.payload.indexOf('_') > 0) { page = '/det.html'; }
+          getPage(node, page, function (resultGetPage, body) {
             if (!resultGetPage.error && body !== '') {
               scraped = scraper.load(body);
               msgResult = scraped('#' + msg.payload).text().trim();
@@ -66,10 +68,10 @@ module.exports = function (RED) {
     });// end this.on
   } // end komfovent node get
 
-  // function for fetching the page and scrape with cherio
-  function getPage (node, call) {
+  // function for fetching the page and scrape with cheerio, param page for subpages feature later
+  function getPage (node, page, call) {
     request.post({
-      url: 'http://' + node.komfoUser.ip,
+      url: 'http://' + node.komfoUser.ip + page,
       headers: { }
     },
     function (err, result, body) {

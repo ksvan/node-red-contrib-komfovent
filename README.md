@@ -62,6 +62,7 @@ Please note that as of now, return values includes the type, the unit the value 
 	{ error: false, result: '40 %', unit: 192.168.x.x } 
 
 ### Field names
+These are case sensitive
 
 #### Temperature and environment
 - ai0 is supply temperature
