@@ -5,7 +5,8 @@ The node supports the (way too basic) web auth for this unit and uses the ajax c
 
 This package is by no means associated with or supported by the actual vendor of the ventilation units, but should be perfectly safe to use, as it only replicates the exact actions of the web based controller.
 
-# Feature DEV Branch for screen scraping version
+## Latest changes
+See changelog, but please note package now contains a getter node, screen scraping komfovent for detailed metrics. This adds dependencies. 
 
 
 # To install
