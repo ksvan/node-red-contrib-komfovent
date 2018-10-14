@@ -51,7 +51,7 @@ Result can also be stringified error object from Request.post, on errors not han
 This is the node for fetching status and metrics available from the web page of the controller. 
 
 ### Input and results
-The node takes a string as input, id of the datafield wanted. You can get a list of the most common below or use dev tools or view source of komfovent to find the IDs you want. However, please note that the scraper being used, Cheerios, does not support iframes. So IDs found here will not be extracted as of now. Food for future releases.
+The node takes a string as input, id of the datafield wanted. You can get a list of the most common below or use dev tools or view source of komfovent to find the IDs you want. However, please note that the scraper being used, Cheerios, does not support iframes. So IDs found here will not be extracted as of now. Food for future releases. This node however as specific support to scrape the det.html page instead if id names contains underscore.
 
 	msg.payload = 'ai0' // would return string value of supply temp, in the json object shown below
 
@@ -69,18 +69,24 @@ These are case sensitive
 - ai1 is extract temperature
 - ai2 is outdoor temperature
 - rh is relative humidity in percentage
+- v_s1 is sensor 1 humidity if present % (if sensor installed)
+- v_s2 is sensor 2 humidity if present % (if sensor installed)
+- v_ph1 is panels humidity level % (if panel provides this)
 
 #### Heating
 - ec2 is heat recovery measurement
 - ec4 is current heating power in watts
 - ec1 is current heat exchanger effecieny in %
 - ec7d is kWh spent on heating for current day. ec7m is for month and ec7t total
+- v_eh is heater operating level
 
 #### System metrics
 - fcg is filter clogging level %
 - ec3 is current power consumption
 - ec8d is recovered energy in kWh current day. ec8m for month, ec8t total
 - ec6d is consumed energy in kWh for the day. ec6m for month and ec6t for total
+- v_ad is air dampers %
+- v_es is energy saving level
 
 #### Pressure
 - saf is suppy flow in percentage
