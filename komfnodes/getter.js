@@ -10,7 +10,8 @@ module.exports = function (RED) {
     // Retrieve the config node
     try {
       this.komfoUser = RED.nodes.getNode(config.user);
-    } catch (err) {
+    }
+    catch (err) {
       this.error('Komfovent - Error, no login node exists - komfovent - setter.js l-13: ' + err);
       this.debug('Komfovent - Couldnt get config node : ' + this.komfoUser);
     }
@@ -38,7 +39,8 @@ module.exports = function (RED) {
           node.debug('Komfovent getNode error logging on');
           msg.payload = resultLogon;
           node.send(msg);
-        } else {
+        }
+        else {
           let scraped;
           let page = '';
           if (msg.payload.indexOf('_') > 0) { page = '/det.html'; }
@@ -63,7 +65,6 @@ module.exports = function (RED) {
             }
           });
         }
-        return;
       });
     });// end this.on
   } // end komfovent node get
@@ -99,7 +100,8 @@ module.exports = function (RED) {
         node.warn('Komfovent - Problem logging on komfovent: ' + JSON.stringify(err));
         if (err.errno === 'ENOTFOUND' || err.errno === 'EHOSTDOWN') {
           return call({ error: true, result: 'address not found for unit', unit: node.komfoUser.ip });
-        } else {
+        }
+        else {
           return call({ error: true, result: JSON.stringify(err), unit: node.komfoUser.ip });
         }
       }

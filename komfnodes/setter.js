@@ -11,7 +11,8 @@ module.exports = function (RED) {
     // Retrieve the config node
     try {
       this.komfoUser = RED.nodes.getNode(config.user);
-    } catch (err) {
+    }
+    catch (err) {
       this.error('Komfovent - Error, no login node exists - komfovent - setter.js l-13: ' + err);
       this.debug('Komfovent - Couldnt get config node : ' + this.komfoUser);
     }
@@ -89,7 +90,8 @@ module.exports = function (RED) {
         node.warn('Komfovent - Problem logging on komfovent: ' + JSON.stringify(err));
         if (err.errno === 'ENOTFOUND' || err.errno === 'EHOSTDOWN') {
           return call({ error: true, result: 'address not found for unit', unit: node.komfoUser.ip });
-        } else {
+        }
+        else {
           return call({ error: true, result: JSON.stringify(err), unit: node.komfoUser.ip });
         }
       }
@@ -121,7 +123,8 @@ module.exports = function (RED) {
         if (err.errno === 'ENOTFOUND' || err.errno === 'EHOSTDOWN') {
           node.warn('Komfovent - cannot reach unit for set-mode - ' + node.komfouser.ip);
           return call({ error: true, result: 'unit not found with address ', unit: node.komfoUser.ip });
-        } else {
+        }
+        else {
           return call({ error: true, result: JSON.stringify(err), unit: node.komfoUser.ip });
         }
       }
