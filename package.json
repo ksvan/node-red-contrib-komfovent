@@ -7,8 +7,8 @@
   "dependencies": {
     "node-red": "^0.18.4",
     "package.json": "^2.0.1",
-    "request":"^2.88.0",
-    "cheerio":"^1.0.0"
+    "request": "^2.88.0",
+    "cheerio": "^0.22.0"
   },
   "keywords": [
     "komfovent",
@@ -37,6 +37,6 @@
     "eslint-plugin-standard": "^4.0.0"
   },
   "scripts": {
-  "test": "eslint *.js && eslint komfnodes/*.js"
-}
+    "test": "eslint *.js && eslint komfnodes/*.js"
+  }
 }
