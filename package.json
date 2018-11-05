@@ -37,6 +37,6 @@
     "eslint-plugin-standard": "^4.0.0"
   },
   "scripts": {
-    "test": "eslint *.js && eslint komfnodes/*.js"
+    "test": "eslint komfnodes/*.js"
   }
 }
