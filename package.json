@@ -5,7 +5,7 @@
   "author": "Kristian Svantorp",
   "license": "MIT",
   "dependencies": {
-    "node-red": "^0.18.4",
+    "node-red": "^0.19.5",
     "package.json": "^2.0.1",
     "request": "^2.88.0",
     "cheerio": "^0.22.0"
@@ -29,17 +29,17 @@
   },
   "devDependencies": {
     "eslint": "^5.5.0",
-    "eslint-config-google": "^0.10.0",
+    "eslint-config-google": "^0.11.0",
     "eslint-config-standard": "^12.0.0",
     "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-node": "^8.0.0",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
     "eslint-plugin-mocha": "^5.2.0",
     "should": "^13.2.3",
     "node-red-node-test-helper": "^0.1.8",
     "mocha": "^5.2.0",
-    "node-red": "^0.18.7"
+    "node-red": "^0.19.5"
   },
   "scripts": {
     "test": "eslint komfnodes/*.js"

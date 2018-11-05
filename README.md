@@ -1,5 +1,8 @@
 
 # Node-red-contrib-komfovent
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/ksvan/node-red-contrib-komfovent.svg)](https://greenkeeper.io/)
+
 This package contains nodes to work with Komfovent ventilation units, mainly with the C6 controller with built in webserver.
 The node supports the (way too basic) web auth for this unit and uses the ajax calls to integrate. Currently support for changing modes and fetching status/metric/sensor data.
 
