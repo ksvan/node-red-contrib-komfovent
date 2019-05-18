@@ -5,10 +5,10 @@
   "author": "Kristian Svantorp",
   "license": "MIT",
   "dependencies": {
-    "package.json": "^2.0.1",
-    "request": "^2.88.0",
-    "cheerio": "^0.22.0",
-    "node-red": "^0.20.0"
+    "cheerio": ">=1.0.0-rc.3",
+    "node-red": ">=0.20.0",
+    "package.json": ">=2.0.1",
+    "request": ">=2.88.0"
   },
   "keywords": [
     "komfovent",
