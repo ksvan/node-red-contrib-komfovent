@@ -21,6 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fix
 - displayName issue for configuration nodes
 
+## [0.3.1]
+
+### Fix
+- dependency issues
+
 
 ## [0.3.0] 14.10.2018
 
