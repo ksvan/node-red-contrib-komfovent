@@ -78,11 +78,11 @@ module.exports = function (RED) {
     function (err, result, body) {
       node.debug('Komfovent -  logon result - Error ' + err);
       if (!err) {
-        return call(result, body);
+        call(result, body);
       }
       else {
         node.warn('Error getting page');
-        return call({ error: true, result: JSON.stringify(err), unit: node.komfoUser.ip }, '');
+        call({ error: true, result: JSON.stringify(err), unit: node.komfoUser.ip }, '');
       }
     });
   }
@@ -95,25 +95,24 @@ module.exports = function (RED) {
       headers: { 'Content-Length': logonBody.length },
       body: logonBody
     }, function (err, result, body) {
-      node.debug('Komfovent -  logon result - Error ' + err);
+      // node.debug('Komfovent -  logon result - Error ' + err);
       if (err) {
         node.warn('Komfovent - Problem logging on komfovent: ' + JSON.stringify(err));
         if (err.errno === 'ENOTFOUND' || err.errno === 'EHOSTDOWN') {
-          return call({ error: true, result: 'address not found for unit', unit: node.komfoUser.ip });
+          call({ error: true, result: 'address not found for unit', unit: node.komfoUser.ip });
         }
         else {
-          return call({ error: true, result: JSON.stringify(err), unit: node.komfoUser.ip });
+          call({ error: true, result: JSON.stringify(err), unit: node.komfoUser.ip });
         }
       }
       else if (body.indexOf('Incorrect password!') >= 0) {
         node.warn('Komfovent - wrong password for unit');
         node.debug('Komfovent return: ' + result.body);
-        return call({ error: true, result: 'wrong password ', unit: node.komfoUser.ip });
+        call({ error: true, result: 'wrong password ', unit: node.komfoUser.ip });
       }
       else {
         // for now, assuimg this means we're logged on
-        node.debug('Komfovent - got logon result back - success');
-        return call({ error: false, result: 'logged on', unit: node.komfoUser.ip });
+        call({ error: false, result: 'logged on', unit: node.komfoUser.ip });
       }
     });
   }

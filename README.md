@@ -33,7 +33,7 @@ This is the first action node, that will let you activate the different modes of
 
 	Auto - The unit will either follow the chosen program (workweek etc) or manage speed based on sensors if installed (humidity, temp)
 	Away - Usually a low intensity mode, based on your settings
-	Normal - the setting for operating normally when at home. Should have been calibrated by your installation vendor
+	Home - the setting for operating normally when at home. Should have been calibrated by your installation vendor
 	Intensive - for hot days or extra people in the house, fans at higher speeds
 	Boost - for when you really need to exchange that air
 
@@ -44,7 +44,7 @@ The node takes strings as input, the name of the wanted operating mode.
 	
 	msg.payload = 'intensive';
 
-Return values are either the mode if success, or the error returned. (add error value info)
+Return values are either the mode if success, or nothing if error, to stop the flow. The error returned is logged.
 
 	{ error: true, result: 'wrong password', unit: 192.168.x.x }
 	{ error: false, result: 'auto', unit: 192.168.x.x }
@@ -62,6 +62,7 @@ The node takes a string as input, id of the datafield wanted. You can get a list
 
 Please note that as of now, return values includes the type, the unit the value is set in, as defined in the web page. And the same capitalization.
 
+Errors are printed to the log, nothing is returned from the node, to stop the flow
 	{ error: false, result: '16.6 C', unit: 192.168.x.x } 
 	{ error: false, result: 'BOOST', unit: 192.168.x.x } 
 	{ error: false, result: '40 %', unit: 192.168.x.x } 

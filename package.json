@@ -6,9 +6,7 @@
   "license": "MIT",
   "dependencies": {
     "cheerio": ">=1.0.0-rc.3",
-    "eslint-plugin-json": "^1.4.0",
     "node-red": ">=0.20.0",
-    "package.json": ">=2.0.1",
     "request": ">=2.88.0"
   },
   "keywords": [
@@ -29,10 +27,12 @@
     "url": "https://github.com/ksvan/node-red-contrib-komfovent.git"
   },
   "devDependencies": {
-    "eslint": "^5.5.0",
+    "ajv": "^6.10.0",
+    "eslint": "^5.16.0",
     "eslint-config-google": "^0.13.0",
     "eslint-config-standard": "^12.0.0",
     "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-json": "^1.4.0",
     "eslint-plugin-mocha": "^5.2.0",
     "eslint-plugin-node": "^9.0.0",
     "eslint-plugin-promise": "^4.0.1",

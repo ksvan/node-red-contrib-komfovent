@@ -29,11 +29,10 @@ module.exports = function (RED) {
     // what to do with payload incoming ///
     this.on('input', function (msg) {
       // validate input, right mode and lookup code
-      var pay = msg.payload;
+      var pay = msg.payload.toLowerCase();
       var mode = { name: 'auto', code: '285=2' };
       request = require('request');
 
-      mode.name = pay;
       switch (pay) {
         case 'away':
           mode.code = node.komfoUser.mode.away;
@@ -56,13 +55,14 @@ module.exports = function (RED) {
           node.send(msg);
           return;
       }
-
+      mode.name = pay;
       // logon to komfovent each time, with callback below
       node.debug('Komfovent - connecting to adress http://' + node.komfoUser.ip);
       komfoLogon(node, msg, function (result) {
         msg.payload = result;
         if (result.error) {
           // didnt work, return msg with error to the flow
+          node.warn('An error occured logging on');
           node.send(msg);
         }
         else {
@@ -71,39 +71,40 @@ module.exports = function (RED) {
             msg.payload = result;
             node.send(msg);
           }); // komfomode end
-          node.send(msg);
         }
       }); // komfologon end
     }); // this on.input end
   }
 
   // function purely for handling logon
-  function komfoLogon (node, call) {
+  function komfoLogon (node, msg, call) {
     var logonBody = '1=' + node.komfoUser.credentials.username + '&' + '2=' + node.komfoUser.credentials.password;
     request.post({
       url: 'http://' + node.komfoUser.ip,
       headers: { 'Content-Length': logonBody.length },
       body: logonBody
     }, function (err, result, body) {
-      node.debug('Komfovent -  logon result - Error ' + err);
+      // node.debug('Komfovent -  logon result - Error ' + err);
       if (err) {
         node.warn('Komfovent - Problem logging on komfovent: ' + JSON.stringify(err));
         if (err.errno === 'ENOTFOUND' || err.errno === 'EHOSTDOWN') {
-          return call({ error: true, result: 'address not found for unit', unit: node.komfoUser.ip });
+          node.warn('address not found for unit' + node.komfoUser.ip);
+          call({ error: true, details: err });
         }
         else {
-          return call({ error: true, result: JSON.stringify(err), unit: node.komfoUser.ip });
+          node.warn('unknown issue connecting');
+          call({ error: true, details: err });
         }
       }
       else if (body.indexOf('Incorrect password!') >= 0) {
         node.warn('Komfovent - wrong password for unit');
         node.debug('Komfovent return: ' + result.body);
-        return call({ error: true, result: 'wrong password ', unit: node.komfoUser.ip });
+        call({ error: true, details: err });
       }
       else {
         // for now, assuimg this means we're logged on
-        node.debug('Komfovent - got logon result back - success');
-        return call({ error: false, result: 'logged on', unit: node.komfoUser.ip });
+        // node.debug('Komfovent - got logon result back - success');
+        call({ error: false, details: 'logged on' });
       }
     });
   }
@@ -121,17 +122,16 @@ module.exports = function (RED) {
       if (err) {
         node.warn('Komfovent - Problem setting mode : ' + JSON.stringify(err));
         if (err.errno === 'ENOTFOUND' || err.errno === 'EHOSTDOWN') {
-          node.warn('Komfovent - cannot reach unit for set-mode - ' + node.komfouser.ip);
-          return call({ error: true, result: 'unit not found with address ', unit: node.komfoUser.ip });
+          node.warn('Komfovent - cannot reach unit for set-mode, unit not found - ' + node.komfouser.ip);
         }
         else {
-          return call({ error: true, result: JSON.stringify(err), unit: node.komfoUser.ip });
+          node.warn('unknown connection issue' + node.komfoUser.ip);
         }
       }
       else {
         // for now assuming this means mode has been set
         node.debug('Komfovent setmode return status: ' + result.statusCode);
-        node.debug('Komfovent set mode - returned body \n\r' + result.body);
+        // node.debug('Komfovent set mode - returned body \n\r' + result.body);
         return call({ error: false, result: mode.name, unit: node.komfoUser.ip });
       }
     });

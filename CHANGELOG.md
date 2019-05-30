@@ -11,21 +11,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Screen scraping support datafields from the other pages as well (those in iframes on the main page)
 - screen scraping, specifically figure out which settings are enabled/disabled
 - config of setter node, to be a predefined action on any input. simplfy use in flows
+- add unit/integration tests
 
 ### Changed
-- Moving to promises requests
+- Moving to promises requests, async awaits for better readability
 - validate logon better, by parsing returned body
 - screen scraping, remove data unit definiton from returns, ie % C etc
-- move duplicated code into libs (komfologon, scraping)
+- move duplicated code into separate modules (komfologon, scraping). Also make it easier to use komfovent logic outside of nodered
 
 ### Fix
 - displayName issue for configuration nodes
 
-## [0.3.2] 29.05.19
+## [0.3.2] 30.05.19
 
 ### Fix
-- dependency issues
+- dependency issues, incl cherios
+- wrong password crash
+- callback issues
 
+### Changed
+- error handling, removed some debug and changed returned objects
 
 ## [0.3.1] 14.10.2018
 
