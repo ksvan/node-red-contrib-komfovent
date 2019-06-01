@@ -25,12 +25,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.3.2] 30.05.19
 
 ### Fix
-- dependency issues, incl cherios
+- dependency issues, incl cherios - main release reason
 - wrong password crash
-- callback issues
+- callback improvements
 
 ### Changed
 - error handling, removed some debug and changed returned objects
+
+### Added 
+- automated testing started
 
 ## [0.3.1] 14.10.2018
 

@@ -7,6 +7,7 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config);
     // initial config of the node  ///
     var node = this;
+    this.displayName = config.displayName;
     // Retrieve the config node
     try {
       this.komfoUser = RED.nodes.getNode(config.user);
@@ -27,6 +28,7 @@ module.exports = function (RED) {
 
     // what to do with payload incoming ///
     this.on('input', function (msg) {
+      console.log('received');
       request = require('request');
       scraper = require('cheerio');
       let msgResult = 't';
