@@ -7,20 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Addedd
 
-- Supporting more specific modes with timeouts
+- Supporting more specific fan modes with timeouts
 - Screen scraping support datafields from the other pages as well (those in iframes on the main page)
 - screen scraping, specifically figure out which settings are enabled/disabled
 - config of setter node, to be a predefined action on any input. simplfy use in flows
 - add unit/integration tests
 
 ### Changed
-- Moving to promises requests, async awaits for better readability
+- Moving to promises requests, async awaits for better readability. away from old call back pattern
 - validate logon better, by parsing returned body
 - screen scraping, remove data unit definiton from returns, ie % C etc
 - move duplicated code into separate modules (komfologon, scraping). Also make it easier to use komfovent logic outside of nodered
 
 ### Fix
 - displayName issue for configuration nodes
+- moving error msgs to shared constants
+- consistency in return object, always using result: and not details: for errors
+
+## [0.3.3]
+
+### Addedd
+- Simple unit testing w mocking
+
+### Changed
+- Dependencies update, incl devdep
+- Updates for node >1.x. Breaking changes for nodered installs <1.0. Specifically for error handling and sending
+
+### Fixed
+- consistency in logging categories, warn vs error
 
 ## [0.3.2] 30.05.19
 

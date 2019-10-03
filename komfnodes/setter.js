@@ -5,29 +5,30 @@ module.exports = function (RED) {
   function komfoventNode (config) {
     RED.nodes.createNode(this, config);
 
-    // initial config of the node  ///
-    var node = this;
-
+    // initial config of the node //
+    var node = this; // explicit context, this node
+    node.displayName = config.displayName;
     // Retrieve the config node
     try {
-      this.komfoUser = RED.nodes.getNode(config.user);
+      node.komfoUser = RED.nodes.getNode(config.user);
     }
     catch (err) {
-      this.error('Komfovent - Error, no login node exists - komfovent - setter.js l-13: ' + err);
-      this.debug('Komfovent - Couldnt get config node : ' + this.komfoUser);
+      node.error('Komfovent - Error, no login node exists - komfovent - setter.js l-13: ' + err);
+      node.debug('Komfovent - Couldnt get config node : ' + this.komfoUser);
+      return;
     }
     // validate settings when creating node
     if (typeof node.komfoUser === 'undefined' || !node.komfoUser || !node.komfoUser.credentials.username || !node.komfoUser.credentials.password) {
-      this.warn('Komfovent - No credentials given! Missing config node details. komfovent setter.js l-17 :' + node.komfoUser);
+      node.error('Komfovent - No credentials given! Missing config node details. komfovent setter.js l-17 :' + node.komfoUser);
       return;
     }
     if (typeof node.komfoUser.ip === 'undefined' || !node.komfoUser.ip) {
-      this.warn('Komfovent - No IP to komfovent unit found, cannot continue');
+      node.error('Komfovent - No IP to komfovent unit found, cannot continue');
       return;
     }
 
     // what to do with payload incoming ///
-    this.on('input', function (msg) {
+    node.on('input', function (msg, send, done) {
       // validate input, right mode and lookup code
       var pay = msg.payload.toLowerCase();
       var mode = { name: 'auto', code: '285=2' };
@@ -51,8 +52,8 @@ module.exports = function (RED) {
           break;
         default:
           node.warn('Komfovent - unsupported mode');
-          msg.payload = { Error: true, details: 'unsupported mode', unit: node.komfoUser.ip };
-          node.send(msg);
+          msg.payload = { error: true, result: 'Unsupported mode', unit: node.komfoUser.ip };
+          send(msg);
           return;
       }
       mode.name = pay;
@@ -62,14 +63,16 @@ module.exports = function (RED) {
         msg.payload = result;
         if (result.error) {
           // didnt work, return msg with error to the flow
-          node.warn('An error occured logging on');
-          node.send(msg);
+          node.error('An error occured logging on');
+          send(msg);
+          done('An error occured logging on');
         }
         else {
           // send http ajax to set mode, with callback below
           komfoMode(mode, node, msg, function (result) {
             msg.payload = result;
-            node.send(msg);
+            send(msg);
+            done();
           }); // komfomode end
         }
       }); // komfologon end
@@ -86,25 +89,25 @@ module.exports = function (RED) {
     }, function (err, result, body) {
       // node.debug('Komfovent -  logon result - Error ' + err);
       if (err) {
-        node.warn('Komfovent - Problem logging on komfovent: ' + JSON.stringify(err));
+        node.error('Komfovent - Problem logging on komfovent: ' + JSON.stringify(err));
         if (err.errno === 'ENOTFOUND' || err.errno === 'EHOSTDOWN') {
-          node.warn('address not found for unit' + node.komfoUser.ip);
-          call({ error: true, details: err });
+          node.error('address not found for unit' + node.komfoUser.ip);
+          call({ error: true, result: err });
         }
         else {
-          node.warn('unknown issue connecting');
-          call({ error: true, details: err });
+          node.error('unknown issue connecting');
+          call({ error: true, result: err });
         }
       }
       else if (body.indexOf('Incorrect password!') >= 0) {
-        node.warn('Komfovent - wrong password for unit');
+        node.error('Komfovent - wrong password for unit');
         node.debug('Komfovent return: ' + result.body);
-        call({ error: true, details: err });
+        call({ error: true, result: err });
       }
       else {
         // for now, assuimg this means we're logged on
         // node.debug('Komfovent - got logon result back - success');
-        call({ error: false, details: 'logged on' });
+        call({ error: false, result: 'logged on' });
       }
     });
   }
@@ -117,15 +120,17 @@ module.exports = function (RED) {
       headers: { 'Content-Length': mode.code.length },
       body: mode.code
     }, function (err, result) {
-      node.debug('Komfovent - set-mode result - Error ' + err);
       // node.debug('komfovent result is in komfo - Body ' + result.body)
       if (err) {
+        node.debug('Komfovent - set-mode result - Error ' + err);
         node.warn('Komfovent - Problem setting mode : ' + JSON.stringify(err));
         if (err.errno === 'ENOTFOUND' || err.errno === 'EHOSTDOWN') {
-          node.warn('Komfovent - cannot reach unit for set-mode, unit not found - ' + node.komfouser.ip);
+          node.error('Komfovent - cannot reach unit for set-mode, unit not found - ' + node.komfouser.ip);
+          call({ error: true, result: 'Could not connect to host' });
         }
         else {
-          node.warn('unknown connection issue' + node.komfoUser.ip);
+          node.error('unknown connection issue' + node.komfoUser.ip);
+          call({ error: true, result: 'Unknown connection issue' });
         }
       }
       else {

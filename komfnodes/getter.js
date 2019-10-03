@@ -13,34 +13,34 @@ module.exports = function (RED) {
       this.komfoUser = RED.nodes.getNode(config.user);
     }
     catch (err) {
-      this.error('Komfovent - Error, no login node exists - komfovent - setter.js l-13: ' + err);
-      this.debug('Komfovent - Couldnt get config node : ' + this.komfoUser);
+      node.debug('Komfovent - Couldnt get config node : ' + this.komfoUser);
+      node.error('Komfovent - Error, no login node exists - komfovent - setter.js l-13: ' + err);
+      return;
     }
     // validate settings when creating node
     if (typeof node.komfoUser === 'undefined' || !node.komfoUser || !node.komfoUser.credentials.username || !node.komfoUser.credentials.password) {
-      this.warn('Komfovent - No credentials given! Missing config node details. komfovent setter.js l-17 :' + node.komfoUser);
+      node.error('Komfovent - No credentials given! Missing config node details. komfovent setter.js l-17 :' + node.komfoUser);
       return;
     }
     if (typeof node.komfoUser.ip === 'undefined' || !node.komfoUser.ip) {
-      this.warn('Komfovent - No IP to komfovent unit found, cannot continue');
+      node.error('Komfovent - No IP to komfovent unit found, cannot continue');
       return;
     }
 
     // what to do with payload incoming ///
-    this.on('input', function (msg) {
-      console.log('received');
+    this.on('input', function (msg, send, done) {
       request = require('request');
       scraper = require('cheerio');
       let msgResult = 't';
       if (typeof msg.payload !== 'string' || !msg.payload || msg.payload === '') {
-        node.warn('Komfovent - empty ID received, quitting');
-        return;
+        done('Komfovent - empty ID received, quitting');
       }
+      // logon with callback
       komfoLogon(node, function (resultLogon) {
         if (resultLogon.error) {
           node.debug('Komfovent getNode error logging on');
           msg.payload = resultLogon;
-          node.send(msg);
+          send(msg);
         }
         else {
           let scraped;
@@ -52,28 +52,29 @@ module.exports = function (RED) {
               msgResult = scraped('#' + msg.payload).text().trim();
 
               if (typeof msgResult === 'undefined' || !msgResult || msgResult === '') {
-                node.warn('Error, id not found: ' + msg.payload);
-                msg.payload = { error: true, result: 'id not found', unit: node.komfoUser.ip };
-                node.send(msg);
+                node.debug('Error, id not found: ' + msg.payload);
+                msg.payload = { error: true, result: 'ID not found', unit: node.komfoUser.ip };
+                send(msg);
               }
               else {
                 // seems like we got the data without errors
                 msg.payload = { error: false, result: msgResult, unit: node.komfoUser.ip };
-                node.send(msg);
+                send(msg);
               }
             }
             else {
-              node.warn('Komfovent error fetching page: http://' + node.komfoUser.ip);
+              done('Komfovent error fetching page: http://' + node.komfoUser.ip);
             }
           });
         }
       });
+      done();
     });// end this.on
   } // end komfovent node get
 
   // function for fetching the page and scrape with cheerio, param page for subpages feature later
   function getPage (node, page, call) {
-    request.post({
+    request.get({
       url: 'http://' + node.komfoUser.ip + page,
       headers: { }
     },
@@ -83,7 +84,7 @@ module.exports = function (RED) {
         call(result, body);
       }
       else {
-        node.warn('Error getting page');
+        node.debug('Error getting page');
         call({ error: true, result: JSON.stringify(err), unit: node.komfoUser.ip }, '');
       }
     });
@@ -99,7 +100,7 @@ module.exports = function (RED) {
     }, function (err, result, body) {
       // node.debug('Komfovent -  logon result - Error ' + err);
       if (err) {
-        node.warn('Komfovent - Problem logging on komfovent: ' + JSON.stringify(err));
+        node.debug('Komfovent - Problem logging on komfovent: ' + JSON.stringify(err));
         if (err.errno === 'ENOTFOUND' || err.errno === 'EHOSTDOWN') {
           call({ error: true, result: 'address not found for unit', unit: node.komfoUser.ip });
         }
@@ -108,7 +109,6 @@ module.exports = function (RED) {
         }
       }
       else if (body.indexOf('Incorrect password!') >= 0) {
-        node.warn('Komfovent - wrong password for unit');
         node.debug('Komfovent return: ' + result.body);
         call({ error: true, result: 'wrong password ', unit: node.komfoUser.ip });
       }
