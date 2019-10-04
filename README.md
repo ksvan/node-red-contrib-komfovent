@@ -4,7 +4,7 @@
 [![Greenkeeper badge](https://badges.greenkeeper.io/ksvan/node-red-contrib-komfovent.svg)](https://greenkeeper.io/)
 [![Build Status](https://travis-ci.com/ksvan/node-red-contrib-komfovent.svg?branch=master)](https://travis-ci.com)
 
-This package contains nodes to work with Komfovent ventilation units, mainly with the C6 controller with built in webserver.
+This package contains nodes to work with Komfovent ventilation units, mainly with the C6 controller with built-in webserver.
 The node supports the (way too basic) web auth for this unit and uses the ajax calls to integrate. Currently support for changing modes and fetching status/metric/sensor data.
 
 This package is by no means associated with or supported by the actual vendor of the ventilation units, but should be perfectly safe to use, as it only replicates the exact actions of the web based controller.
@@ -37,7 +37,7 @@ This is the first action node, that will let you activate the different modes of
 	Intensive - for hot days or extra people in the house, fans at higher speeds
 	Boost - for when you really need to exchange that air
 
-Please note that in the C6 webcontroller, the Auto and Eco modes are toggle switches. If you call it once, auto mode is activated. Twice, and it falls back to last known standard mode (away, normal etc). 
+Please note that in the C6 webcontroller, the Auto and Eco modes are toggle switches. If you call it once, auto mode is activated. Twice, and it falls back to last known standard mode (away, normal etc). If nodes are used for automating based on events from other system, you should handle this state with other nodes.
 
 ### Input and results 
 The node takes strings as input, the name of the wanted operating mode.
@@ -102,7 +102,7 @@ These are case sensitive
 Add support for more modes also with timers(fireplace, kitchen ventilation etc)
 Surfarcing the actual commands sent in the config node might also be relevant in the future, making them available for change by configuration.
 For scraping, adding support to fetch which modes and controls are activated, other than actual fanspeed.
-Maybe adding support for specifically handling the modes implemented as toggle switches (auto, eco) and remove the toggle issue of the controller. But this has multiple quality/troubleshooting implications and would require scraping actual data from the controller first.
+Maybe adding support for specifically handling the modes implemented as toggle switches (auto, eco) and remove the toggle issue of the controller. But this has multiple state/quality/troubleshooting/logic implications and would require scraping actual data from the controller first, might end up a separate node to handle that when applicable in users flows.
 
 
 ## Handling toggle switches
@@ -134,13 +134,15 @@ Due to the annoying nature of ventilation systems and their lacking capabilities
 Most errors will be surfaced in the returned json structure and the most common ones is handled specifically (wrong password, host not found).
 
 The node is tested against the C6 controller running 1.3.14.14 firmware, being a bit inconsistent in logon and having issues setting mode.
-Main part of the work has been done with the newer 1.3.17.20 firmware. See the komfovent.com webpage for end users and downloads to find the newest firmware and instructions on how to update. (Download the bin file, turn of the fan, go to http://yourunit/g1.html, upload bin file and wait. Mind that if you are fare behind, there could be intermediate upgrades to go through first.)
+Main part of the work has been done with the newer 1.3.17.20 firmware. See the komfovent.com webpage for end users and downloads to find the newest firmware and instructions on how to update. (Download the bin file, turn of the fan, go to http://yourunit/g1.html, upload bin file and wait. Mind that if you are far behind, there could be intermediate upgrades to go through first.)
 
 The units built in webserver handles auth by receiving the body of 1=username&2=password. The system will return HTTP 200 even when auth fails, just hihglighting "incorrect password" in the page sent back.
 Mode is set by posting to the ajax.xml file, with a body of for instance 3=1, 3=2 etc. Note that Automode is called by 285=2, but this is a toggle switch. Calling it twice will have the system go back to the last mode activated.
 In automode, the system will alter fanspeed based on either sensors or the weekly plan you have defined.
 
 Please note that timeouts can be long for wrong or not reachable hosts, as this would be defined by the OS TCP/IP timeout settings.
+
+Also, look at reverse.md file for more details and design considerations.
 
 ## Networking
 The C6 controller only supports physical ethernet connection, the rj45 to be found inside the unit, with specific channels to lead the cable through.
