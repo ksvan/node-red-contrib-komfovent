@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - validate logon better, by parsing returned body
 - screen scraping, remove data unit definiton from returns, ie % C etc
 - move duplicated code into separate modules (komfologon, scraping). Also make it easier to use komfovent logic outside of nodered
+- look into moving error/warnings up in the call stack, passed from sub functions to nodered now. Maybe not needed anymore, enough info flowing up
 
 ### Fix
 - displayName issue for configuration nodes
@@ -30,11 +31,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Simple unit testing w mocking
 
 ### Changed
-- Dependencies update, incl devdep
+- Dependencies update, incl devdep. Now switched Request with Axio for http
 - Updates for node >1.x. Breaking changes for nodered installs <1.0. Specifically for error handling and sending
+- Refactored logon and mode functions to axio and async/await/then pattern, from callback
 
 ### Fixed
 - consistency in logging categories, warn vs error
+- tested with C6 controller 1.3.17.20
 
 ## [0.3.2] 30.05.19
 
