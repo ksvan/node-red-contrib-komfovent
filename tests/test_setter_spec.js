@@ -20,20 +20,18 @@ describe('Komfovent setter node-red', function () {
     // setup intercepts
     // intercept search for main page
     nock(netScope)
-      .log(console.log)
       .persist()
       .get('/')
       .replyWithFile(200, `${__dirname}/index.html`);
     nock(netScope)
-      .log(console.log)
       .persist()
       .post('/')
       .replyWithFile(200, `${__dirname}/index.html`);
     // intercept auth token, reply with fake token
     nock(netScope)
-      .log(console.log)
       .persist()
       .post('/ajax.xml')
+      .delay(500)
       .replyWithFile(200, `${__dirname}/ajax.xml`);
 
     nock.emitter.on('no match', req => {
@@ -94,10 +92,28 @@ it('should return error', function (done) {
         msg.payload.should.have.property('result', 'Unsupported mode');
         done();
       });
-      n1.on('call:log', call => {
+      n1.on('call:error', call => {
         console.log("error: " + call)
       });
       n1.receive({ payload: 'v_s1ert' }); // not existing mode
+    });
+  }); // it end
+
+  // Node should reply with error, unknown value
+it('should return changed mode w delay', function (done) {
+    this.timeout(5000);
+    helper.load([komfoSetNode, komfoConfNode], flow, credentials, function () {
+      let n1 = helper.getNode('n1');
+      let nh = helper.getNode('nh');
+      nh.on('input', msg =>  {
+        msg.payload.should.have.property('error', false);
+        msg.payload.should.have.property('result', 'auto');
+        done();
+      });
+      n1.on('call:error', call => {
+        console.log("error: " + call)
+      });
+      n1.receive({ payload: 'auto' }); //  existing mode
     });
   }); // it end
 

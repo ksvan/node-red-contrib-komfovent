@@ -26,14 +26,11 @@ module.exports = function (RED) {
       node.error('Komfovent - No IP to komfovent unit found, cannot continue');
       return;
     }
-
     // what to do with payload incoming ///
     node.on('input', function (msg, send, done) {
       // validate input, right mode and lookup code
       var pay = msg.payload.toLowerCase();
       var mode = { name: 'auto', code: '285=2' };
-      request = require('request');
-
       switch (pay) {
         case 'away':
           mode.code = node.komfoUser.mode.away;
@@ -56,90 +53,118 @@ module.exports = function (RED) {
           send(msg);
           return;
       }
-      mode.name = pay;
+      mode.name = pay; // mode sent as command, validated to exist now
       // logon to komfovent each time, with callback below
       node.debug('Komfovent - connecting to adress http://' + node.komfoUser.ip);
-      komfoLogon(node, msg, function (result) {
-        msg.payload = result;
-        if (result.error) {
-          // didnt work, return msg with error to the flow
-          node.error('An error occured logging on');
-          send(msg);
-          done('An error occured logging on');
-        }
-        else {
-          // send http ajax to set mode, with callback below
-          komfoMode(mode, node, msg, function (result) {
+      komfoLogon(node)
+        .then(result => {
+          // then are we logged on?
+          if (result.error) {
             msg.payload = result;
             send(msg);
-            done();
-          }); // komfomode end
-        }
-      }); // komfologon end
+            done(result);
+          }
+          else {
+            // we are ok, go change mode
+            komfoMode(mode, node)
+              .then(result => {
+                msg.payload = result;
+                send(msg);
+                if (result.error) {
+                  done(result);
+                }
+                else {
+                  // success
+                  done();
+                }
+              })
+              .catch(error => {
+                // threw something when setting mode
+                node.error('Failed setting mode ' + JSON.stringify(error));
+                done('Failed setting mode ' + JSON.stringify(error));
+              });
+          }
+        })
+        .catch(error => {
+          // threw something on logon
+          node.error('failed logon' + JSON.stringify(error));
+        });
     }); // this on.input end
   }
 
   // function purely for handling logon
-  function komfoLogon (node, msg, call) {
-    var logonBody = '1=' + node.komfoUser.credentials.username + '&' + '2=' + node.komfoUser.credentials.password;
-    request.post({
+  async function komfoLogon (node) {
+    request = require('axios');// require('request');
+    let result;
+    const postConfig = {
       url: 'http://' + node.komfoUser.ip,
-      headers: { 'Content-Length': logonBody.length },
-      body: logonBody
-    }, function (err, result, body) {
-      // node.debug('Komfovent -  logon result - Error ' + err);
-      if (err) {
-        node.error('Komfovent - Problem logging on komfovent: ' + JSON.stringify(err));
-        if (err.errno === 'ENOTFOUND' || err.errno === 'EHOSTDOWN') {
-          node.error('address not found for unit' + node.komfoUser.ip);
-          call({ error: true, result: err });
-        }
-        else {
-          node.error('unknown issue connecting');
-          call({ error: true, result: err });
-        }
-      }
-      else if (body.indexOf('Incorrect password!') >= 0) {
-        node.error('Komfovent - wrong password for unit');
-        node.debug('Komfovent return: ' + result.body);
-        call({ error: true, result: err });
+      // headers: { 'Content-Length': logonBody.length },
+      method: 'POST',
+      body: '1=' + node.komfoUser.credentials.username + '&' + '2=' + node.komfoUser.credentials.password
+    };
+    // Make a request for logon
+    try {
+      result = await request(postConfig);
+    }
+    catch (err) {
+      node.error('Komfovent - Problem logging on komfovent: ' + JSON.stringify(err));
+      if (err.errno === 'ENOTFOUND' || err.errno === 'EHOSTDOWN') {
+        node.error('address not found for unit' + node.komfoUser.ip);
+        return { error: true, result: err };
       }
       else {
-        // for now, assuimg this means we're logged on
-        // node.debug('Komfovent - got logon result back - success');
-        call({ error: false, result: 'logged on' });
+        node.error('unknown issue connecting');
+        return { error: true, result: err };
       }
-    });
+    } // catch error end
+    // check that we are actually logged on
+    if (result.data.indexOf('Incorrect password!') >= 0 || result.status > 200) {
+      node.error('Komfovent - wrong password for unit');
+      node.debug('Komfovent return: ' + result.body);
+      return { error: true, result: 'Wrong password for unit' };
+    }
+    else if (result.data.indexOf('value="Logout') >= 0 && result.status === 200) {
+      // then assume we are logged on correctly
+      return { error: false, result: 'logged on' };
+    }
+    else {
+      // seems like something unknown failed, the beauty of screenscraping
+      console.log('error something');
+      return { error: true, result: 'Something totally unknown happened with logon' };
+    }
   }
 
   // function for setting mode
-  function komfoMode (mode, node, msg, call) {
-    node.debug('Payload start function ' + mode.code);
-    request.post({
+  async function komfoMode (mode, node) {
+    request = require('axios');// require('request');
+    let result;
+    // defining message needed by c6 to switch modes
+    const postConfig = {
       url: 'http://' + node.komfoUser.ip + '/ajax.xml',
-      headers: { 'Content-Length': mode.code.length },
+      // headers: { 'Content-Length': logonBody.length },
+      method: 'POST',
       body: mode.code
-    }, function (err, result) {
-      // node.debug('komfovent result is in komfo - Body ' + result.body)
-      if (err) {
-        node.debug('Komfovent - set-mode result - Error ' + err);
-        node.warn('Komfovent - Problem setting mode : ' + JSON.stringify(err));
-        if (err.errno === 'ENOTFOUND' || err.errno === 'EHOSTDOWN') {
-          node.error('Komfovent - cannot reach unit for set-mode, unit not found - ' + node.komfouser.ip);
-          call({ error: true, result: 'Could not connect to host' });
-        }
-        else {
-          node.error('unknown connection issue' + node.komfoUser.ip);
-          call({ error: true, result: 'Unknown connection issue' });
-        }
+    };
+    // make request for mode change
+    try {
+      result = await request(postConfig);
+    }
+    catch (err) {
+      node.debug('Komfovent - set-mode result - Error ' + err);
+      node.error('Komfovent - Problem setting mode : ' + JSON.stringify(err));
+      if (err.errno === 'ENOTFOUND' || err.errno === 'EHOSTDOWN') {
+        node.error('Komfovent - cannot reach unit for set-mode, unit not found - ' + node.komfouser.ip);
+        return { error: true, result: 'Could not connect to host' };
       }
       else {
-        // for now assuming this means mode has been set
-        node.debug('Komfovent setmode return status: ' + result.statusCode);
-        // node.debug('Komfovent set mode - returned body \n\r' + result.body);
-        return call({ error: false, result: mode.name, unit: node.komfoUser.ip });
+        node.error('unknown connection issue setting mode' + node.komfoUser.ip);
+        return { error: true, result: 'Unknown connection issue when setting mode' };
       }
-    });
+    }
+    if (result.status === 200 && result.data.indexOf('c6') > 0) {
+      // then assuming it was ok, right http and the weird standard body response from C6 controller
+      return { error: false, result: mode.name, unit: node.komfoUser.ip };
+    }
   }
 
   RED.nodes.registerType('komfoventNode', komfoventNode);

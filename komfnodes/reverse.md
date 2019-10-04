@@ -2,16 +2,24 @@
 My own documentation of results during reversing, sniffing, trial and error. 
 
 ## Reversed
-- What: Komfovent ventilation aggregate with C6 controller
-- Purpose: for smarthome integration
+- What: Komfovent ventilation aggregate with C6 controller (fw 1.3.17.20 latest reversed and verified)
+- Purpose: for smarthome integration via nodered
 - Protocol: HTTP/TCP
 - Method: Reuse ajax calls to trigger actions, scrape pages for information
 - Security: Next to non existing, simple unsecured logon
 
+### Considerations
+Done before: not for this specific use case. But screen scraping in general is highly solved and reusable as tactic.
+
+Alternatives: modbus or bacnet integration. Seems like hard to use and low quality in existing libs. Old school protocol gone TCP, not easily available good documentation from vendor, seems ro rely on electrican domain knowledge in addition. REST apis would be good, ajax calls gives kind of the same for setting config. Fetching values is worse, screen scraping. 
+
+Going modbus would be a logical level below, requiring more understanding of the aggregate/machinery etc, not to get unexpected results from different value combinations. This is handled by C6 web logic and should reside on the system side, not withing my code. 
+Looked into the ios app they provide, this is implemented with modbus, so not interesting as such. Also provides less datapoints than the web.
+
 ### How
 For the most part using Chrome dev tools and wireshark to decompose the pages and calling structure.
 Wireshark to compare real traffic with what I can generated with node.js request, make them similar.
-Trial and error, figuring out what matters for the server on the C6 controller.
+Trial and error, figuring out what matters for the server on the C6 controller, trying to get to the bare minimum needed to mimic the right interaction, as little as possible that could go wrong with future firmware C6 updates and maintenance needs on my side.
 
 ## Logon - what seems to work best
 Komfovent built in webserver for controller C6.
@@ -25,7 +33,7 @@ Komfovent built in webserver for controller C6.
 
 Komfovent seems to require Host to be present.
 Content-type seems to vary, especially the ajax calls are a bit different (naturally). But seems to work best without setting the headers.
-Content-Length though seems to be case sensitive and should come before	host and other headers...
+Content-Length though seems to be case sensitive and should come before	host and other headers... varies how the standard libs handles this. For axio it seems fine to let lib handle that part.
 
 ### Switching modes for komfovent
 In komfovent's world they separate between to concepts quite similar from an enduser point of view.
@@ -60,6 +68,7 @@ This would activate Fireplace for 80 minutes.
       headers: { 'Content-Length': mode.code.length },
       body: mode.code
     } 
+body then beeing ie 283=80
 
 ### Modes
 
@@ -86,8 +95,8 @@ The page calls ajax.xml to post changes.
 - c_cfg2.html is the settings page for operation controls.
 
 ### ID, Field names
-Not all fields are in the same page, which parsers like cheerios have issues with. Main page of komfovent uses several iframes.
-In general, all fields without underscores seems to be available on main page (current hypotheses)
+Not all fields are in/from the same page, which parsers like cheerios have issues with. Main page of komfovent uses several iframes.
+In general, all fields without underscores seems to be available on main page (current hypotheses). Needs to fetch the subpages directly and find some consistency in the IDs with regards to what page they belong in.
 
 #### Temperature and heating
 - ai0 is supply temperature
@@ -103,13 +112,17 @@ In general, all fields without underscores seems to be available on main page (c
 - saf is suppy flow in percentage
 - eaf is extract airflow in percentage
 
-#### Other metrics
+#### Humidity
 - rh is relative humidity in percentage
 - v_s1 is sensor 1 humidity if present %
 - v_s2 is sensor 2 humidity if present %
 - v_ph1 is panels humidity level %
+
+#### Other sensors and metrics
 - fcg is filter clogging level %
 - v_ad is air dampers %
+
+#### Energy metrics
 - v_es is energy saving level
 - ec3 is current power consumption
 - ec8d is recovered energy in kWh current day. ec8m for month, ec8t total
@@ -126,10 +139,7 @@ In general, all fields without underscores seems to be available on main page (c
 - om-8 is holidays (timed, date intervall)
 - oc-1 is eco control mode
 - oc-2 is auto control mode
-- omo is current operational level of the fan, also in case of running auto.
-
-om-x fields are shown with a property data-selected="1" is currently active, but no property if not active.
-oc-x fields are shown with the same property if selected, but also set to 0 if not active.
+- omo is current operational level of the fan, also in case of running auto
 
 #### Operations schedules
 - so-2 is woorking week
@@ -137,8 +147,11 @@ oc-x fields are shown with the same property if selected, but also set to 0 if n
 - so-3 is office
 - so-4 is custom schedule
 
+#### Field naming conventions
+IDs with _ seems to be gathered at the det.html page.
 so-x fields are shown with a property data-selected="1" is currently active, but no property if not active.
-
+om-x fields are shown with a property data-selected="1" is currently active, but no property if not active.
+oc-x fields are shown with the same property if selected, but also set to 0 if not active.
 
 
 
