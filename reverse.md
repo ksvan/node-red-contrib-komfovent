@@ -152,7 +152,3 @@ IDs with _ seems to be gathered at the det.html page.
 so-x fields are shown with a property data-selected="1" is currently active, but no property if not active.
 om-x fields are shown with a property data-selected="1" is currently active, but no property if not active.
 oc-x fields are shown with the same property if selected, but also set to 0 if not active.
-
-
-
-
