@@ -79,8 +79,6 @@ describe('Komfovent setter node-red', function () {
     });
   }); // it end
 
-
-
 // Node should reply with error, unknown value
 it('should return error', function (done) {
     this.timeout(5000);
@@ -99,7 +97,7 @@ it('should return error', function (done) {
     });
   }); // it end
 
-  // Node should reply with error, unknown value
+  // Node should reply with changed mode
 it('should return changed mode w delay', function (done) {
     this.timeout(5000);
     helper.load([komfoSetNode, komfoConfNode], flow, credentials, function () {
