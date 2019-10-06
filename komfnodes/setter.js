@@ -2,13 +2,14 @@ module.exports = function (RED) {
   'use strict';
   var request;
 
+  // the function needed by nodered to make instances of the node
   function komfoventNode (config) {
     RED.nodes.createNode(this, config);
 
     // initial config of the node //
     var node = this; // explicit context, this node
     node.displayName = config.displayName;
-    // Retrieve the config node
+    // Retrieve the config node and validate
     try {
       node.komfoUser = RED.nodes.getNode(config.user);
     }
@@ -26,6 +27,7 @@ module.exports = function (RED) {
       node.error('Komfovent - No IP to komfovent unit found, cannot continue');
       return;
     }
+    // node established
     // what to do with payload incoming ///
     node.on('input', function (msg, send, done) {
       // validate input, right mode and lookup code
