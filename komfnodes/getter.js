@@ -8,7 +8,7 @@ module.exports = function (RED) {
     // initial config of the node  ///
     var node = this;
     this.displayName = config.displayName;
-    // Retrieve the config node
+    // Retrieve the config node and validate
     try {
       this.komfoUser = RED.nodes.getNode(config.user);
     }

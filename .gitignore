@@ -6,3 +6,5 @@ node-modules/
 node_modules
 *sublime*
 .DS_Store
+komfovent.code-workspace
+.stryker*

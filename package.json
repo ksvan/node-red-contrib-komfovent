@@ -26,6 +26,11 @@
     "url": "https://github.com/ksvan/node-red-contrib-komfovent.git"
   },
   "devDependencies": {
+    "@stryker-mutator/core": "^2.1.0",
+    "@stryker-mutator/html-reporter": "^2.1.0",
+    "@stryker-mutator/javascript-mutator": "^2.1.0",
+    "@stryker-mutator/mocha-framework": "^2.1.0",
+    "@stryker-mutator/mocha-runner": "^2.1.0",
     "ajv": "^6.10.0",
     "axios": "^0.19.0",
     "eslint": "^6.5.1",
