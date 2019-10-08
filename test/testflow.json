@@ -1,0 +1,243 @@
+[
+  {
+    "id": "288b011f.18e52e",
+    "type": "tab",
+    "label": "Flow 2",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "9d7dae9f.be8ae",
+    "type": "komfoventNode",
+    "z": "288b011f.18e52e",
+    "name": "",
+    "user": "72ea5d42.e78224",
+    "x": 300,
+    "y": 120,
+    "wires": [
+      [
+        "3dff3282.bdd67e"
+      ]
+    ]
+  },
+  {
+    "id": "64492c3.bd564d4",
+    "type": "komfoventNodeGet",
+    "z": "288b011f.18e52e",
+    "name": "",
+    "user": "31a960d7.c6c3e",
+    "x": 310,
+    "y": 240,
+    "wires": [
+      [
+        "31bbf26c.6c088e"
+      ]
+    ]
+  },
+  {
+    "id": "ea829716.c2afb8",
+    "type": "inject",
+    "z": "288b011f.18e52e",
+    "name": "",
+    "topic": "",
+    "payload": "home",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "x": 130,
+    "y": 120,
+    "wires": [
+      [
+        "9d7dae9f.be8ae"
+      ]
+    ]
+  },
+  {
+    "id": "3dff3282.bdd67e",
+    "type": "debug",
+    "z": "288b011f.18e52e",
+    "name": "setter",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 490,
+    "y": 120,
+    "wires": []
+  },
+  {
+    "id": "f01db48b.d98208",
+    "type": "inject",
+    "z": "288b011f.18e52e",
+    "name": "",
+    "topic": "",
+    "payload": "auto",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "x": 110,
+    "y": 60,
+    "wires": [
+      [
+        "9d7dae9f.be8ae"
+      ]
+    ]
+  },
+  {
+    "id": "98ecc3af.d3ea2",
+    "type": "inject",
+    "z": "288b011f.18e52e",
+    "name": "",
+    "topic": "",
+    "payload": "ai0",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "x": 90,
+    "y": 240,
+    "wires": [
+      [
+        "64492c3.bd564d4"
+      ]
+    ]
+  },
+  {
+    "id": "31bbf26c.6c088e",
+    "type": "debug",
+    "z": "288b011f.18e52e",
+    "name": "getter",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 490,
+    "y": 240,
+    "wires": []
+  },
+  {
+    "id": "791590db.2b9b2",
+    "type": "inject",
+    "z": "288b011f.18e52e",
+    "name": "",
+    "topic": "",
+    "payload": "v_s2",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "x": 90,
+    "y": 280,
+    "wires": [
+      [
+        "64492c3.bd564d4"
+      ]
+    ]
+  },
+  {
+    "id": "331395cc.b2d87a",
+    "type": "inject",
+    "z": "288b011f.18e52e",
+    "name": "",
+    "topic": "",
+    "payload": "saf",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "x": 90,
+    "y": 320,
+    "wires": [
+      [
+        "64492c3.bd564d4"
+      ]
+    ]
+  },
+  {
+    "id": "2248c5e5.e13d7a",
+    "type": "inject",
+    "z": "288b011f.18e52e",
+    "name": "error",
+    "topic": "",
+    "payload": "ai0xs",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "x": 90,
+    "y": 360,
+    "wires": [
+      [
+        "64492c3.bd564d4"
+      ]
+    ]
+  },
+  {
+    "id": "9d5573c4.ec27",
+    "type": "inject",
+    "z": "288b011f.18e52e",
+    "name": "fcg",
+    "topic": "",
+    "payload": "fcg",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "x": 90,
+    "y": 400,
+    "wires": [
+      [
+        "64492c3.bd564d4"
+      ]
+    ]
+  },
+  {
+    "id": "faafc2bf.d970e",
+    "type": "inject",
+    "z": "288b011f.18e52e",
+    "name": "",
+    "topic": "",
+    "payload": "boost",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "x": 130,
+    "y": 160,
+    "wires": [
+      [
+        "9d7dae9f.be8ae"
+      ]
+    ]
+  },
+  {
+    "id": "72ea5d42.e78224",
+    "type": "komfoventConfig",
+    "z": "",
+    "displayName": "vent",
+    "siteName": "",
+    "ip": "192.168.1.2"
+  },
+  {
+    "id": "31a960d7.c6c3e",
+    "type": "komfoventConfig",
+    "z": "",
+    "displayName": "vent2",
+    "siteName": "",
+    "ip": "192.168.1.2"
+  }
+]
