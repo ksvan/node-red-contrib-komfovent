@@ -10,11 +10,18 @@ Private functions does not, they throw. All functions are async
 */
 
 module.exports = class Komfovent {
-  /* create at new instance of the class, connected to chosen unit. Remove if ending up useless...
+  // create at new instance of the class, connected to chosen unit. Remove if ending up useless...
   constructor () {
-
+    const mode = {
+      home: '3=2',
+      away: '3=1',
+      auto: '285=2',
+      intensive: '3=3',
+      boost: '3=4',
+      fireplace: '283',
+      kitchen: '282'
+    };
   } // constructor end
-*/
 
   /* private makeRequest()
   * * generic methog to make the http calls using axios
@@ -46,6 +53,13 @@ module.exports = class Komfovent {
   * @param ip for the komfovent unit in question
   */
   async logon (username, password, ip) {
+    // validate input
+    if (typeof username !== 'string' || !username || typeof password !== 'string' || !password) {
+      return ({ error: true, result: 'Empty username/password received, quitting' });
+    }
+    if (typeof ip !== 'string' || !ip) {
+      return ({ error: true, result: 'Empty IP received, quitting' });
+    }
     const postConfig = {
       url: 'http://' + ip,
       method: 'POST',
@@ -71,11 +85,18 @@ module.exports = class Komfovent {
 
   /* public etMode()
   * * function to set a mode on the logged on unit. Will not work, but not fail, if not logged on first
-  * TODO: future validation that the actual mode was set ok. Better error flow
+  * TODO: future validation that the actual mode was set ok. Better error flow. check what device returns for bad modes
   * @param mode Input object mode{name: 'auto', code: '285=2'}, where code is the values Komfovent expects
   * @param ip address of the komfovent unit to set mode on
   */
   async setMode (mode, ip) {
+    // validate input
+    if (typeof mode.code !== 'string' || !mode) {
+      return ({ error: true, result: 'Empty mode received, quitting' });
+    }
+    if (typeof ip !== 'string' || !ip) {
+      return ({ error: true, result: 'Empty IP received, quitting' });
+    }
     // defining message needed by c6 to switch modes
     const postConfig = {
       url: 'http://' + ip + '/ajax.xml',
@@ -89,17 +110,20 @@ module.exports = class Komfovent {
       return { error: false, result: mode.name };
     }
     else {
-      return result;
+      return { error: true, result: 'Could not set mode. Non existing? ' + mode.name };
     }
   } // setmode end
 
   // function to fetch mode
   async getMode (ip) {
+    if (typeof ip !== 'string' || !ip) {
+      return ({ error: true, result: 'Empty IP received, quitting' });
+    }
     try {
       const scraped = await this.getData('data', ip);
       const msgResult = scraped('.controlh-1').attr('data-selected', '1').text(); // .attr('data-selected');
       console.dir(msgResult);
-      if (typeof msgResult === 'undefined' || !msgResult || msgResult === '') {
+      if (typeof msgResult === 'undefined' || !msgResult) {
         return { error: true, result: 'Active mode not found', unit: ip };
       }
       else {
@@ -120,6 +144,14 @@ module.exports = class Komfovent {
   * @return cherio object for query of scraped content
   */
   async getData (name, ip) {
+    // validate input
+    // validate input
+    if (typeof name !== 'string' || !name) {
+      return ({ error: true, result: 'Empty ID received, quitting' });
+    }
+    if (typeof ip !== 'string' || !ip) {
+      return ({ error: true, result: 'Empty IP received, quitting' });
+    }
     // change target to subpage if identity/name
     const page = name.indexOf('_') > 0 ? 'det.html' : '';
     // setup for get request
@@ -130,14 +162,14 @@ module.exports = class Komfovent {
     // get the page and scrape it
     const result = await this.makeRequest(getConfig);
     // validate results before parsing
-    if (result !== 'undefined' && result !== '' && !result.error && result.data !== '') {
+    if (result !== 'undefined' && result && !result.error && result.data) {
       // load scraper and scrape recieved content
       const scraper = require('cheerio');
       const scraped = scraper.load(result.data);
       return scraped;
     }
     else {
-      throw new Error('Invalid result from scraper');
+      throw new Error('Could not fetch page: ' + result.result);
     }
   } // getData end
 
@@ -148,13 +180,16 @@ module.exports = class Komfovent {
   */
   async getId (name, ip) {
     // validate input
-    if (typeof name !== 'string' || !name || name === '') {
-      return ({ error: true, result: 'Komfovent - empty ID received, quitting' });
+    if (typeof name !== 'string' || !name) {
+      return ({ error: true, result: 'Empty ID received, quitting' });
+    }
+    if (typeof ip !== 'string' || !ip) {
+      return ({ error: true, result: 'Empty IP received, quitting' });
     }
     try {
       const scraped = await this.getData(name, ip);
       const msgResult = scraped('#' + name).text().trim();
-      if (typeof msgResult === 'undefined' || !msgResult || msgResult === '') {
+      if (typeof msgResult === 'undefined' || !msgResult) {
         return { error: true, result: 'ID not found', unit: ip };
       }
       else {
