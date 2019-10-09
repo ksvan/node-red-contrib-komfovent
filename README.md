@@ -128,6 +128,15 @@ Auto and eco mode is toggling the modes when called. If you call it once, auto m
 The basic and not very trustworthy security of the unit means that you should take care when integrating witt and exposing it. Never put it directly online, integrate locally or secure your communications and terminate it as close to the unit as possible.
 Please not that the units c6 controller does not support SSL/TLS. Do make sure that you do not reuse a password from your other services or IoT devices etc.
 
+# Komfovent class
+Foundational module for all nodes, Komfoventclass. Contains functions for get/set modes, get data. 
+- getMode(ip)
+- setMode(mode, name) where mode is {name: 'auto|away|etc, code:'285=2'}
+- getId(id, ip) where id is the name of datafield to fetch
+- logon(username,password,ip)
+
+All functions are stateless and does new requests to the unit each time called. Public functions listed below validates input and returns json objects as described above, for results and errors. Private functions does not, they throw and do not validate input.
+
 # Troubleshooting
 Due to the annoying nature of ventilation systems and their lacking capabilities in digitalization, there is a lot more debug output from this node than I would usually add. To use it, run node-red -debug
 

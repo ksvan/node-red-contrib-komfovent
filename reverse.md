@@ -41,7 +41,7 @@ In komfovent's world they separate between to concepts quite similar from an end
 - Operation control (mode) - which is a more dynamic plan, where speed, heating etc is set based on sensors and/or weekly schedules
 
 This is done by reusing the ajax calls made by the webclient, towards a file at root called ajax.xml
-File returns a small xml saying the controller version and http 200 seemingly anyways. This does not however indicate that the command will be executed.
+File returns a small xml saying the controller version and http 200 seemingly anyways. This does not however indicate that the command will be executed. If incorrect commands are sent, the return from the device is still the same, with a 200 OK.
 
 	<?xml version="1.0" encoding="windows-1252"?>
 	<V>
@@ -52,7 +52,7 @@ Commands are simple payloads, form look a like formatting.
 	3=2 or 285=2
 285 is the auto control, which in the webserver is handled as a toggle switch. Calling it once will set in Auto mode, twice will reset to the last fan mode before auto. 
 
-Traffic towards ajax.xml seems to be expected to have host header set, content type of text/plain and connection keep-alive. But seems to be more stable without any other headers set in request() than case sensitive Content-Length
+Traffic towards ajax.xml seems to be expected to have host header set, content type of text/plain and connection keep-alive. But seems to be more stable without any other headers set in request() than case sensitive Content-Length.
 
 #### Modes with timeouts
 These modes are only accepting a timeout value in minutes as the value. 283 is fireplace, 282 is kitchen ventilator mitigation
@@ -152,3 +152,6 @@ IDs with _ seems to be gathered at the det.html page.
 so-x fields are shown with a property data-selected="1" is currently active, but no property if not active.
 om-x fields are shown with a property data-selected="1" is currently active, but no property if not active.
 oc-x fields are shown with the same property if selected, but also set to 0 if not active.
+
+## HTTP
+Det device has a built in webserver. This does not seem to return anything but 200 OK, even if wrong password, wrong input data in POST etc.
