@@ -11,17 +11,9 @@ Private functions does not, they throw. All functions are async
 
 module.exports = class Komfovent {
   // create at new instance of the class, connected to chosen unit. Remove if ending up useless...
-  constructor () {
-    const mode = {
-      home: '3=2',
-      away: '3=1',
-      auto: '285=2',
-      intensive: '3=3',
-      boost: '3=4',
-      fireplace: '283',
-      kitchen: '282'
-    };
+  /* constructor () {
   } // constructor end
+  */
 
   /* private makeRequest()
   * * generic methog to make the http calls using axios
@@ -114,11 +106,13 @@ module.exports = class Komfovent {
     }
   } // setmode end
 
-  // function to fetch mode
+  /* private getMode()
+  * * Function to fetch currently active mode
+  * TODO fix attrib scan from scraper and find text value of active mode
+  * @param ip ip of the unit to fetch mode status from
+  */
   async getMode (ip) {
-    if (typeof ip !== 'string' || !ip) {
-      return ({ error: true, result: 'Empty IP received, quitting' });
-    }
+    // no validate input, private
     try {
       const scraped = await this.getData('data', ip);
       const msgResult = scraped('.controlh-1').attr('data-selected', '1').text(); // .attr('data-selected');
@@ -144,14 +138,7 @@ module.exports = class Komfovent {
   * @return cherio object for query of scraped content
   */
   async getData (name, ip) {
-    // validate input
-    // validate input
-    if (typeof name !== 'string' || !name) {
-      return ({ error: true, result: 'Empty ID received, quitting' });
-    }
-    if (typeof ip !== 'string' || !ip) {
-      return ({ error: true, result: 'Empty IP received, quitting' });
-    }
+    // no validate input, private only
     // change target to subpage if identity/name
     const page = name.indexOf('_') > 0 ? 'det.html' : '';
     // setup for get request
@@ -181,10 +168,10 @@ module.exports = class Komfovent {
   async getId (name, ip) {
     // validate input
     if (typeof name !== 'string' || !name) {
-      return ({ error: true, result: 'Empty ID received, quitting' });
+      return ({ error: true, result: 'Empty ID recieved, quitting' });
     }
     if (typeof ip !== 'string' || !ip) {
-      return ({ error: true, result: 'Empty IP received, quitting' });
+      return ({ error: true, result: 'Empty IP recieved, quitting' });
     }
     try {
       const scraped = await this.getData(name, ip);
