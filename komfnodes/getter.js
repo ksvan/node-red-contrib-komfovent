@@ -1,14 +1,14 @@
 module.exports = function (RED) {
   'use strict';
-  var request;
-  var scraper;
 
   function komfoventNodeGet (config) {
+    const komfoInt = new (require('komfovent.js'))();
     RED.nodes.createNode(this, config);
     // initial config of the node  ///
     var node = this;
     this.displayName = config.displayName;
-    // Retrieve the config node and validate
+    // Retrieve the config node and validate setup of node
+    const credentials = node.komfoUser.credentials;
     try {
       this.komfoUser = RED.nodes.getNode(config.user);
     }
@@ -29,50 +29,31 @@ module.exports = function (RED) {
 
     // what to do with payload incoming ///
     this.on('input', function (msg, send, done) {
-      request = require('request');
-      scraper = require('cheerio');
-      let msgResult = 't';
-      if (typeof msg.payload !== 'string' || !msg.payload || msg.payload === '') {
+      if (typeof msg.payload !== 'string' || !msg.payload) {
         done('Komfovent - empty ID received, quitting');
       }
-      // logon with callback
-      komfoLogon(node, function (resultLogon) {
-        if (resultLogon.error) {
+      // logon to unit
+      komfoInt.logon(credentials.username, credentials.password, node.komfoUser.ip)
+        .then(result => {
+          // get the data field from the unit
+          komfoInt.getId(msg.payload, node.komfouser.ip)
+            .then(result => {
+              // return to the flow with data
+              msg.payload = { error: false, result: result, unit: node.komfoUser.ip };
+              send(msg);
+              done();
+            });
+        })
+        .catch(error => {
+          // TODO check flow for handling different errors. verify what is surfaced
           node.debug('Komfovent getNode error logging on');
-          msg.payload = resultLogon;
+          msg.payload = error;
           send(msg);
-        }
-        else {
-          let scraped;
-          let page = '';
-          if (msg.payload.indexOf('_') > 0) { page = '/det.html'; }
-          getPage(node, page, function (resultGetPage, body) {
-            if (!resultGetPage.error && body !== '') {
-              scraped = scraper.load(body);
-              msgResult = scraped('#' + msg.payload).text().trim();
-
-              if (typeof msgResult === 'undefined' || !msgResult || msgResult === '') {
-                node.debug('Error, id not found: ' + msg.payload);
-                msg.payload = { error: true, result: 'ID not found', unit: node.komfoUser.ip };
-                send(msg);
-              }
-              else {
-                // seems like we got the data without errors
-                msg.payload = { error: false, result: msgResult, unit: node.komfoUser.ip };
-                send(msg);
-              }
-            }
-            else {
-              done('Komfovent error fetching page: http://' + node.komfoUser.ip);
-            }
-          });
-        }
-      });
-      done();
+        });
     });// end this.on
-  } // end komfovent node get
+  }; // end komfovent node get
 
-  // function for fetching the page and scrape with cheerio, param page for subpages feature later
+  /* // function for fetching the page and scrape with cheerio, param page for subpages feature later
   function getPage (node, page, call) {
     request.get({
       url: 'http://' + node.komfoUser.ip + page,
@@ -117,7 +98,6 @@ module.exports = function (RED) {
         call({ error: false, result: 'logged on', unit: node.komfoUser.ip });
       }
     });
-  }
-
+  } */
   RED.nodes.registerType('komfoventNodeGet', komfoventNodeGet);
 };
