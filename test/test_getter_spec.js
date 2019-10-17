@@ -1,10 +1,10 @@
 /* eslint-env mocha */
 'use strict';
-let should = require('should');
-let nock = require('nock');
-let helper = require('node-red-node-test-helper');
-let komfoGetNode = require('../komfnodes/getter.js');
-let komfoConfNode = require('../komfnodes/config.js');
+const should = require('should');
+const nock = require('nock');
+const helper = require('node-red-node-test-helper');
+const komfoGetNode = require('../komfnodes/getter.js');
+const komfoConfNode = require('../komfnodes/config.js');
 
 const netScope = 'http://192.168.1.1';
 
@@ -33,9 +33,9 @@ describe('Komfovent getter node-red', function () {
       .get('/det.html')
       .replyWithFile(200, `${__dirname}/det.html`);
 
-    nock.emitter.on('no match', req => {
+    /* nock.emitter.on('no match', req => {
       console.log('no match: ');
-    });
+    }); */
   });
 
   afterEach(function () {
@@ -48,19 +48,19 @@ describe('Komfovent getter node-red', function () {
   });
 
   // the way nodered wants to define flows and relations, and initial values
-  let flow = [
+  const flow = [
     { id: 'nc', type: 'komfoventConfig', 'ip': '192.168.1.1', displayName: 'Komfovent Site', 'z': 'f1' },
     { id: 'n1', type: 'komfoventNodeGet', displayName: 'Komfo get Data', user: 'nc', wires: [['nh']], 'z': 'f1' },
     { id: 'nh', type: 'helper', 'z': 'f1' },
     { id: 'f1', type: 'tab', label: 'Test flow' }
   ];
   // separat secret credentials object to be passed in at launch, adhering to how nodered protects secrets
-  let credentials = { nc: { 'username': 'user', 'password': '1234' } };
+  const credentials = { nc: { 'username': 'user', 'password': '1234' } };
 
   // node should be loaded fine in the runtime
   it('should be loaded', function (done) {
     helper.load([komfoGetNode, komfoConfNode], flow, credentials, function () {
-      let n1 = helper.getNode('n1');
+      const n1 = helper.getNode('n1');
       n1.should.have.property('displayName', 'Komfo get Data');
       done();
     });
@@ -69,7 +69,7 @@ describe('Komfovent getter node-red', function () {
   // Node should have logon credentials needed
   it('should have credentials', function (done) {
     helper.load([komfoGetNode, komfoConfNode], flow, credentials, function () {
-      let n1 = helper.getNode('n1');
+      const n1 = helper.getNode('n1');
       n1.komfoUser.credentials.should.have.property('username', 'user');
       n1.komfoUser.should.have.property('ip', '192.168.1.1');
       n1.komfoUser.credentials.should.have.property('password', '1234');
@@ -82,8 +82,8 @@ describe('Komfovent getter node-red', function () {
   it('should fetch supply temperature', function (done) {
     this.timeout(5000);
     helper.load([komfoGetNode, komfoConfNode], flow, credentials, function () {
-      let n1 = helper.getNode('n1');
-      let nh = helper.getNode('nh');
+      const n1 = helper.getNode('n1');
+      const nh = helper.getNode('nh');
       nh.on('input', msg =>  {
         msg.payload.should.have.property('error', false);
         msg.payload.should.have.property('result', '21.0 �C');
@@ -100,8 +100,8 @@ describe('Komfovent getter node-red', function () {
   it('should fetch sensor 1 humidity', function (done) {
     this.timeout(5000);
     helper.load([komfoGetNode, komfoConfNode], flow, credentials, function () {
-      let n1 = helper.getNode('n1');
-      let nh = helper.getNode('nh');
+      const n1 = helper.getNode('n1');
+      const nh = helper.getNode('nh');
       nh.on('input', msg =>  {
         msg.payload.should.have.property('error', false);
         msg.payload.should.have.property('result', '52 %');
@@ -118,8 +118,8 @@ describe('Komfovent getter node-red', function () {
   it('should return error', function (done) {
     this.timeout(5000);
     helper.load([komfoGetNode, komfoConfNode], flow, credentials, function () {
-      let n1 = helper.getNode('n1');
-      let nh = helper.getNode('nh');
+      const n1 = helper.getNode('n1');
+      const nh = helper.getNode('nh');
       nh.on('input', msg =>  {
         msg.payload.should.have.property('error', true);
         msg.payload.should.have.property('result', 'ID not found');

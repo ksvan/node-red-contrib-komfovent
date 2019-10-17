@@ -8,3 +8,7 @@ node_modules
 .DS_Store
 komfovent.code-workspace
 .stryker*
+.nyc*
+coverage/**
+reports/**
+reports/

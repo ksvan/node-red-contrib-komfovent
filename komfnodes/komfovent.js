@@ -5,13 +5,14 @@ Based on reverse engineering of web interface ajax calls, not modbus/bacnet even
 Look at reverse.md for considerations on that design and further details on how stuff works.
 All method stateless, no shared global variables in the class
 
-Public functions returns standard json objects with result and error fields, originally made to simplify usage in nodered. 
+Public functions returns standard json objects with result and error fields as strings, originally made to simplify usage in nodered flows.
 Private functions does not, they throw. All functions are async
 */
 
 module.exports = class Komfovent {
   // create at new instance of the class, connected to chosen unit. Remove if ending up useless...
   /* constructor () {
+     ;
   } // constructor end
   */
 
@@ -27,12 +28,17 @@ module.exports = class Komfovent {
       const result = await request(postConfig);
       return result;
     }
-    catch (err) {
-      if (err.errno === 'ENOTFOUND' || err.errno === 'EHOSTDOWN') {
-        return { error: true, result: err };
+    catch (error) {
+      if (error.response) {
+        // server responded something other than http 2xx
+        throw new Error('No 200 OK recieved. Status was: ' + error.response.status);
+      }
+      else if (error.request) {
+        // server did not respond
+        throw new Error('Unit did not respond: ' + error.request);
       }
       else {
-        return { error: true, result: err };
+        throw new Error('Unknown error with http request: ' + error);
       }
     } // catch error end
   }
@@ -57,7 +63,13 @@ module.exports = class Komfovent {
       method: 'POST',
       body: '1=' + username + '&' + '2=' + password
     };
-    const result = await this.makeRequest(postConfig);
+    let result;
+    try {
+      result = await this.makeRequest(postConfig);
+    }
+    catch (error) {
+      return { error: true, result: error.toString() };
+    }
     // check that we are actually logged on
     if (result === 'undefined' || result === '') {
       return { error: true, result: 'http request failed' };
@@ -115,7 +127,7 @@ module.exports = class Komfovent {
     // no validate input, private
     try {
       const scraped = await this.getData('data', ip);
-      const msgResult = scraped('.controlh-1').attr('data-selected', '1').text(); // .attr('data-selected');
+      const msgResult = scraped('div[data-selected="1"]').innerText();// ('div.control-1'); // .attr('data-selected');
       console.dir(msgResult);
       if (typeof msgResult === 'undefined' || !msgResult) {
         return { error: true, result: 'Active mode not found', unit: ip };

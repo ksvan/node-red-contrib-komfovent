@@ -46,10 +46,11 @@
     "nock": "^11.4.0",
     "node-red": "^1.0.1",
     "node-red-node-test-helper": "^0.2.3",
+    "nyc": "^14.1.1",
     "should": "^13.2.3"
   },
   "scripts": {
     "pretest": "eslint komfnodes/*.js",
-    "test": "mocha \"tests/**/*_spec.js\""
+    "test": "mocha \"test/**/*_spec.js\""
   }
 }

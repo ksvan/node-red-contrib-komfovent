@@ -1,25 +1,27 @@
 /* eslint-env mocha */
 'use strict';
 const Komfovent = require('../komfnodes/komfovent.js');
-let should = require('should');
+const should = require('should');
 const nock = require('nock');
-
-const ip = '192.168.1.1';
-const netScope = 'http://' + ip;
-nock.disableNetConnect();
+const Cheerio = require('cheerio');
+const ip = '192.168.1.1'; // main ip to test with
+const ip2 = '192.168.1.2'; // work around :( cannot make nock body matches to evaluate wrong username
+const netScope = 'http://' + ip; // Ip/scope for main test scope
+const netScope2 = 'http://' + ip2; // IP/scope for corner cases
+nock.disableNetConnect(); // do not allow tests to hit network, fail instead
 // seperat secret credentials object to be passed in at launch, adhering to how nodered protects secrets
 const credentials = { username: 'user', password: '1234' };
 const mode = { name: 'auto', code: '285=2' }; // settings object for mode change tests
 const badMode = { name: 'autoish', code: '2567=234' }; // settings object for mode change tests
-
+const wrongIp = '192.168.2.2';
 /*
 * * mocked testing of spec only.
-* TODO: duplicate without mocking as integration test
-* TODO: fix no logon test so it fails, mocking doesnt match
+* TODO: duplicate without mocking as integration test (allow connection, no mocking, real ip)
+* TODO: tests with new mocks that fails on web fetch and scraping (partial done)
 */
 
 describe('Komfovent integration class', function () {
-  beforeEach(function () {
+  before(function () {
     // setup intercepts
     // intercept search for main page
     nock(netScope)
@@ -32,11 +34,12 @@ describe('Komfovent integration class', function () {
       .get('/det.html')
       .replyWithFile(200, `${__dirname}/det.html`);
     // intercept posts for logon fail
-    // TODO NOT matching post body in mocking
-    nock(netScope)
-      .log(console.log)
+    // TODO NOT matching post body in mocking, current workaround is other netscope
+    nock(netScope2)
       .persist()
-      .post('', {1:'userer', 2:'1234er'}) // '1=' + credentials.username + 'er&2=' + credentials.password + 'er')
+      // .post('', (body) => { body.username === (credentials.username+'er') }) // {1:'userer', 2:'1234er'}) // '1=' + credentials.username + 'er&2=' + credentials.password + 'er')
+      // .post('/', /\duserer+/m)
+      .post('/')
       .replyWithFile(200, `${__dirname}/indexnologon.html`);
     // intercept posts for logon correct
     nock(netScope)
@@ -49,14 +52,70 @@ describe('Komfovent integration class', function () {
       .post('/ajax.xml')
       .delay(500)
       .replyWithFile(200, `${__dirname}/ajax.xml`);
-
-    nock.emitter.on('no match', req => {
-      console.log('no match: ');
-    });
+    // intercept ajax commands ffor failing pages
+    nock(netScope)
+      .persist()
+      .get('/failing.html')
+      .delay(200)
+      .replyWithFile(404, `${__dirname}/ajax.xml`); // TODO fix page
   });
 
   after(function () {
     nock.cleanAll();
+  });
+
+  describe('Komfovent class - makeRequest', function () {
+    it('Should fetch page fine', function (done) {
+      const komfo = new Komfovent();
+      const postConfig = {
+        url: 'http://' + ip,
+        method: 'GET'
+      };
+      komfo.makeRequest(postConfig)
+        .then(result => {
+          result.should.have.property('status', 200);
+          result.should.have.property('data');
+          done();
+        })
+        .catch(error => {
+          console.log('Error making request' + error);
+          // console.dir(error);
+        });
+    });
+    it('Should fail to fetch page 404', function (done) {
+      const komfo = new Komfovent();
+      const postConfig = {
+        url: 'http://' + ip + '/failing.html',
+        method: 'GET'
+      };
+      komfo.makeRequest(postConfig)
+        .then(result => {
+          // failing if here, should throw
+          console.log('Error making failing request');
+          console.dir(result);
+        })
+        .catch(error => {
+          error.toString().should.endWith('404');
+          done();
+        });
+    });
+    it('Should fail to fetch page - no response', function (done) {
+      const komfo = new Komfovent();
+      const postConfig = {
+        url: 'http://' + ip2 + '/failing.html',
+        method: 'GET'
+      };
+      komfo.makeRequest(postConfig)
+        .then(result => {
+          // failing if here, should throw
+          console.log('Error making failing request no response');
+          console.dir(result);
+        })
+        .catch(error => {
+          error.toString().should.startWith('Error: Unit did not respond');
+          done();
+        });
+    });
   });
 
   describe('Komfovent init and logon', function () {
@@ -68,7 +127,7 @@ describe('Komfovent integration class', function () {
     });
 
     // node should logon
-    it('should logon fine given right credentials', function (done) {
+    it('should logon fine given right credentials and ip', function (done) {
       const komfo = new Komfovent();
       komfo.logon(credentials.username, credentials.password, ip)
         .then(result => {
@@ -82,10 +141,10 @@ describe('Komfovent integration class', function () {
         });
     });
 
-    /* // node should not logon wrong password
-    it('should fail with error given wrong password', function (done) {
+    // node should not logon wrong password
+    it('logon should fail with error given wrong password', function (done) {
       const komfo = new Komfovent();
-      komfo.logon(credentials.username + 'er', credentials.password + 'er', ip)
+      komfo.logon(credentials.username + 'er', credentials.password + 'er', ip2)
         .then(result => {
           result.should.have.property('error', true);
           result.should.have.property('result', 'Wrong password for unit');
@@ -95,7 +154,66 @@ describe('Komfovent integration class', function () {
           console.log('Error handling wrong password' + error);
           // console.dir(error);
         });
-    }); */
+    });
+
+    // node should not logon blank password
+    it('logon should fail with error - blank password', function (done) {
+      const komfo = new Komfovent();
+      komfo.logon(credentials.username, '', ip)
+        .then(result => {
+          result.should.have.property('error', true);
+          result.should.have.property('result', 'Empty username/password received, quitting');
+          done();
+        })
+        .catch(error => {
+          console.log('Error handling blank password' + error);
+          // console.dir(error);
+        });
+    });
+
+    // node should not logon numeric username
+    it('logon should fail with error - numeric username', function (done) {
+      const komfo = new Komfovent();
+      komfo.logon(123456, credentials.password, ip)
+        .then(result => {
+          result.should.have.property('error', true);
+          result.should.have.property('result', 'Empty username/password received, quitting');
+          done();
+        })
+        .catch(error => {
+          console.log('Error handling numeric username' + error);
+          // console.dir(error);
+        });
+    });
+
+    // node should not logon given wrong ip
+    it('logon should fail with error - wrongip', function (done) {
+      const komfo = new Komfovent();
+      komfo.logon(credentials.username, credentials.password, wrongIp)
+        .then(result => {
+          result.should.have.property('error', true);
+          result.result.should.startWith('Error: Unit did not respond');
+          done();
+        })
+        .catch(error => {
+          console.log('Error handling wrong ip ' + error);
+          // console.dir(error);
+        });
+    });
+    // node should fail logon with blank ip
+    it('logon should fail with error - Empty ip', function (done) {
+      const komfo = new Komfovent();
+      komfo.logon(credentials.username, credentials.password, '')
+        .then(result => {
+          result.should.have.property('error', true);
+          result.should.have.property('result', 'Empty IP received, quitting');
+          done();
+        })
+        .catch(error => {
+          console.log('Error handling emptyy ip ' + error);
+          console.dir(error);
+        });
+    });
   });
 
   // node should switch mode (IRL wont work without logon first, but mocked here)
@@ -193,7 +311,7 @@ describe('Komfovent integration class', function () {
       komfo.getId('', ip)
         .then(result => {
           result.should.have.property('error', true);
-          result.should.have.property('result', 'Empty ID received, quitting');
+          result.should.have.property('result', 'Empty ID recieved, quitting');
           done();
         })
         .catch(error => {
@@ -204,7 +322,7 @@ describe('Komfovent integration class', function () {
     // node should fetch an error due to wrong IP (not mocked)
     it('should fail fetching due to wrong IP', function (done) {
       const komfo = new Komfovent();
-      komfo.getId('ai0', '192.168.2.1')
+      komfo.getId('ai0', wrongIp)
         .then(result => {
           result.should.have.property('error', true);
           result.should.have.property('result');
@@ -222,7 +340,7 @@ describe('Komfovent integration class', function () {
       komfo.getId('ai0', '')
         .then(result => {
           result.should.have.property('error', true);
-          result.should.have.property('result', 'Empty IP received, quitting');
+          result.should.have.property('result', 'Empty IP recieved, quitting');
           done();
         })
         .catch(error => {
