@@ -3,8 +3,8 @@ module.exports = function (RED) {
   function komfoventConfig (config) {
     RED.nodes.createNode(this, config);
     // var node = this;
-    this.username = config.username;
-    this.password = config.password;
+    /* this.username = config.username;
+    this.password = config.password; */
     this.ip = config.ip;
     this.displayName = config.displayName;
     this.siteName = config.siteName;
