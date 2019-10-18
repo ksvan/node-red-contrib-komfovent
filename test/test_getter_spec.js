@@ -46,17 +46,17 @@ describe('Komfovent getter node-red', function () {
     nock.cleanAll();
     helper.stopServer(done);
   });
-
   // the way nodered wants to define flows and relations, and initial values
   const flow = [
-    { id: 'nc', type: 'komfoventConfig', 'ip': '192.168.1.1', displayName: 'Komfovent Site', 'z': 'f1' },
-    { id: 'n1', type: 'komfoventNodeGet', displayName: 'Komfo get Data', user: 'nc', wires: [['nh']], 'z': 'f1' },
-    { id: 'nh', type: 'helper', 'z': 'f1' },
+    { id: 'nc', type: 'komfoventConfig', ip: '192.168.1.1', displayName: 'Komfovent Site', z: 'f1' },
+    { id: 'n1', type: 'komfoventNodeGet', displayName: 'Komfo get Data', user: 'nc', wires: [['nh']], z: 'f1' },
+    { id: 'nh', type: 'helper', z: 'f1' },
     { id: 'f1', type: 'tab', label: 'Test flow' }
   ];
   // separat secret credentials object to be passed in at launch, adhering to how nodered protects secrets
-  const credentials = { nc: { 'username': 'user', 'password': '1234' } };
+  const credentials = { nc: { username: 'user', password: '1234' } };
 
+  describe('Node load with config', function () {
   // node should be loaded fine in the runtime
   it('should be loaded', function (done) {
     helper.load([komfoGetNode, komfoConfNode], flow, credentials, function () {
@@ -66,6 +66,16 @@ describe('Komfovent getter node-red', function () {
     });
   });
 
+  // node should load but not init without config
+  it('should be loaded with error - missing config', function (done) {
+    helper.load([komfoGetNode], flow, function () {
+      const n1 = helper.getNode('n1');
+      // TODO, fetch error value
+      const log = helper.log().args;
+      console.dir(log);
+      done();
+    });
+  });
   // Node should have logon credentials needed
   it('should have credentials', function (done) {
     helper.load([komfoGetNode, komfoConfNode], flow, credentials, function () {
@@ -78,22 +88,27 @@ describe('Komfovent getter node-red', function () {
     });
   }); // it end
 
+});
+
+describe('Node fetching data', function () {
   // Node should fetch house supply temperature
   it('should fetch supply temperature', function (done) {
-    this.timeout(5000);
-    helper.load([komfoGetNode, komfoConfNode], flow, credentials, function () {
-      const n1 = helper.getNode('n1');
-      const nh = helper.getNode('nh');
-      nh.on('input', msg =>  {
-        msg.payload.should.have.property('error', false);
-        msg.payload.should.have.property('result', '21.0 �C');
-        done();
+    try {
+      helper.load([komfoGetNode, komfoConfNode], flow, credentials, function () {
+        const n1 = helper.getNode('n1');
+        const nh = helper.getNode('nh');
+        nh.on('input', msg => {
+          msg.payload.should.have.property('error', false);
+          msg.payload.should.have.property('result', '21.0 �C');
+          msg.payload.should.have.property('unit', '192.168.1.1');
+          done();
+        });
+        n1.receive({ payload: 'ai0' });
       });
-      n1.on('call:log', call => {
-        console.log("error: " + call)
-      });
-      n1.receive({ payload: 'ai0' });
-    });
+    }
+    catch (error) {
+      console.log('Supply temp failed', error);
+    }
   }); // it end
 
   // Node should fetch sensor humidty (det.html)
@@ -105,10 +120,11 @@ describe('Komfovent getter node-red', function () {
       nh.on('input', msg =>  {
         msg.payload.should.have.property('error', false);
         msg.payload.should.have.property('result', '52 %');
+        msg.payload.should.have.property('unit', '192.168.1.1');
         done();
       });
       n1.on('call:log', call => {
-        console.log("error: " + call)
+        console.log('error: ' + call);
       });
       n1.receive({ payload: 'v_s1' });
     });
@@ -120,15 +136,17 @@ describe('Komfovent getter node-red', function () {
     helper.load([komfoGetNode, komfoConfNode], flow, credentials, function () {
       const n1 = helper.getNode('n1');
       const nh = helper.getNode('nh');
-      nh.on('input', msg =>  {
+      nh.on('input', msg => {
         msg.payload.should.have.property('error', true);
         msg.payload.should.have.property('result', 'ID not found');
+        msg.payload.should.have.property('unit', '192.168.1.1');
         done();
       });
       n1.on('call:log', call => {
-        console.log("error: " + call)
+        console.log('error: ' + call)
       });
       n1.receive({ payload: 'v_s1ert' });
     });
   }); // it end
+});
 });
