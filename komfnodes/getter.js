@@ -7,25 +7,17 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config);
     // initial config of the node  ///
     var node = this;
+    this.displayName = config.displayName;
+    // Retrieve the config node and validate setup of node
     try {
       node.komfoUser = RED.nodes.getNode(config.user);
     }
     catch (err) {
-      node.debug('Komfovent - Error, no login node exists - komfovent - setter.js l-13: ' + err);
-      node.error('Komfovent - Couldnt get config node : ' + this.komfoUser);
-      return;
-    }
-    this.displayName = config.displayName;
-    // Retrieve the config node and validate setup of node
-    const credentials = node.komfoUser.credentials;
-    try {
-      this.komfoUser = RED.nodes.getNode(config.user);
-    }
-    catch (err) {
-      node.debug('Komfovent - Couldnt get config node : ' + this.komfoUser);
+      node.debug('Komfovent - Couldnt get config node : ' + node.komfoUser);
       node.error('Komfovent - Error, no login node exists - komfovent - setter.js l-13: ' + err);
       return;
     }
+    const credentials = node.komfoUser.credentials;
     // validate settings when creating node
     if (typeof node.komfoUser === 'undefined' || !node.komfoUser || !credentials.username || !credentials.password) {
       node.error('Komfovent - No credentials given! Missing config node details. komfovent setter.js l-17 :' + node.komfoUser);
@@ -35,12 +27,12 @@ module.exports = function (RED) {
       node.error('Komfovent - No IP to komfovent unit found, cannot continue');
       return;
     }
-    // -------- INPUT
+    // -------- INPUT event
     // what to do with payload incoming ///
-    this.on('input', function (msg, send, done) {
+    node.on('input', function (msg, send, done) {
       // if input is blank, do nothin, breake the flow
       if (typeof msg.payload !== 'string' || !msg.payload) {
-        done('Komfovent - empty ID received, quitting');
+        done('Komfovent - empty ID recieved, quitting');
       }
       // logon and fetch from unit
       fetch(msg.payload, komfoInt, credentials, node)
