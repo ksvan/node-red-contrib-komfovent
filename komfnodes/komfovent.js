@@ -72,18 +72,18 @@ module.exports = class Komfovent {
     }
     // check that we are actually logged on
     if (result === 'undefined' || result === '') {
-      return { error: true, result: 'http request failed' };
+      return { error: true, result: 'http request failed', unit: ip };
     }
     else if (result.data.indexOf('Incorrect password!') >= 0 || result.status > 200) {
-      return { error: true, result: 'Wrong password for unit' };
+      return { error: true, result: 'Wrong password for unit', unit: ip };
     }
     else if (result.data.indexOf('value="Logout') >= 0 && result.status === 200) {
       // then assume we are logged on correctly
-      return { error: false, result: 'logged on' };
+      return { error: false, result: 'logged on', unit: ip };
     }
     else {
       // seems like something unknown failed, the beauty of screenscraping
-      return { error: true, result: 'Something totally unknown happened with logon' };
+      return { error: true, result: 'Something totally unknown happened with logon', unit: ip };
     }
   }// logon end
 
@@ -96,7 +96,7 @@ module.exports = class Komfovent {
   async setMode (mode, ip) {
     // validate input
     if (typeof mode.code !== 'string' || !mode) {
-      return ({ error: true, result: 'Empty mode received, quitting' });
+      return ({ error: true, result: 'Empty mode received, quitting', unit: ip });
     }
     if (typeof ip !== 'string' || !ip) {
       return ({ error: true, result: 'Empty IP received, quitting' });
@@ -114,7 +114,7 @@ module.exports = class Komfovent {
       return { error: false, result: mode.name };
     }
     else {
-      return { error: true, result: 'Could not set mode. Non existing? ' + mode.name };
+      return { error: true, result: 'Could not set mode. Non existing? ' + mode.name , unit: ip};
     }
   } // setmode end
 
@@ -138,7 +138,7 @@ module.exports = class Komfovent {
       }
     }
     catch (error) {
-      return { error: true, result: 'Could not fetch data for mode: ' + error };
+      return { error: true, result: 'Could not fetch data for mode: ' + error, unit: ip };
     }
   } // getMode end
 
@@ -180,10 +180,10 @@ module.exports = class Komfovent {
   async getId (name, ip) {
     // validate input
     if (typeof name !== 'string' || !name) {
-      return ({ error: true, result: 'Empty ID recieved, quitting' });
+      return ({ error: true, result: 'Empty ID recieved, quitting', unit: ip });
     }
     if (typeof ip !== 'string' || !ip) {
-      return ({ error: true, result: 'Empty IP recieved, quitting' });
+      return ({ error: true, result: 'Empty IP recieved, quitting', unit: ip });
     }
     try {
       const scraped = await this.getData(name, ip);
@@ -197,7 +197,7 @@ module.exports = class Komfovent {
       }
     }
     catch (error) {
-      return { error: true, result: 'Could not fetch data: ' + error };
+      return { error: true, result: 'Could not fetch data: ' + error, unit: ip };
     }
   } // getId end
 };

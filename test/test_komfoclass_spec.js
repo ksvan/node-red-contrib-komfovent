@@ -37,8 +37,6 @@ describe('Komfovent integration class', function () {
     // TODO NOT matching post body in mocking, current workaround is other netscope
     nock(netScope2)
       .persist()
-      // .post('', (body) => { body.username === (credentials.username+'er') }) // {1:'userer', 2:'1234er'}) // '1=' + credentials.username + 'er&2=' + credentials.password + 'er')
-      // .post('/', /\duserer+/m)
       .post('/')
       .replyWithFile(200, `${__dirname}/indexnologon.html`);
     // intercept posts for logon correct
