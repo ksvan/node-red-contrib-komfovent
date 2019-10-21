@@ -105,7 +105,7 @@ module.exports = class Komfovent {
     const postConfig = {
       url: 'http://' + ip + '/ajax.xml',
       method: 'POST',
-      body: mode.code
+      data: mode.code
     };
     // make request for mode change
     const result = await this.makeRequest(postConfig);
