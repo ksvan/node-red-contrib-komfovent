@@ -2,7 +2,6 @@
 'use strict';
 const Komfovent = require('../../komfnodes/komfovent.js');
 const should = require('should');
-const nock = require('nock');
 const Cheerio = require('cheerio');
 const ip = process.env.INTEGRATION_IP || '192.168.1.1'; // main ip to test with
 const wrongIp = '192.168.2.2'; // should be outside of local net, not working
@@ -12,15 +11,15 @@ const mode = { name: 'auto', code: '285=2' }; // settings object for mode change
 const badMode = { name: 'autoish', code: '2567=234' }; // settings object for mode change tests
 
 /*
-* * mocked testing of spec only.
-* TODO: duplicate without mocking as integration test (allow connection, no mocking, real ip)
-* TODO: tests with new mocks that fails on web fetch and scraping (partial done)
+* * Integration test with Comfovent c6 controller
+* pretty much the same as unit test, but tests on bad ip's not included (doesnt resolve/reject before after system tcp init timeout, 75s on mac)
 */
 
 // check if integration test
-const intTest = process.env.INTEGRATION;
-credentials.username = process.env.INTEGRATION_USER;
-credentials.password = process.env.INTEGRATION_PWD;
+const intTest = process.env.INTEGRATION; // true
+const timeOutTest = process.env.INTEGRATION_TIMEOUT || false;// true, blank
+credentials.username = process.env.INTEGRATION_USER || 'user'; // username, blank for default 
+credentials.password = process.env.INTEGRATION_PWD || ''; // real password, int_test.sh will ask
 
 console.log('>>> RUNNING INTEGRATION TEST <<<<');
 console.log('with user: ' + credentials.username + ' and ip: ' + ip);
@@ -62,23 +61,27 @@ describe('Komfovent setter node-red', function () {
           done();
         });
     });
-    it('Should fail to fetch page - no response bad ip', function (done) {
-      const komfo = new Komfovent();
-      const postConfig = {
-        url: 'http://' + wrongIp + '/failing.html',
-        method: 'GET'
-      };
-      komfo.makeRequest(postConfig)
-        .then(result => {
+    if (timeOutTest) {
+      it('Should fail to fetch page - no response bad ip', function (done) {
+        this.timeout(0); // to cater for system setting on tcp init timeout (75s on mac)
+        const komfo = new Komfovent();
+        const postConfig = {
+          url: 'http://' + wrongIp + '/failing.html',
+          method: 'GET'
+        };
+        komfo.makeRequest(postConfig)
+          .then(result => {
           // failing if here, should throw
-          console.log('Error making failing request no response');
-          console.dir(result);
-        })
-        .catch(error => {
-          error.toString().should.startWith('Error: Unit did not respond');
-          done();
-        });
-    });
+            console.log('Error making failing request no response');
+            console.dir(result);
+          })
+          .catch(error => {
+            console.log('>>>error', error);
+            error.toString().should.startWith('Error: Unit did not respond');
+            done();
+          });
+      });
+    }
   });
 
   describe('Komfovent init and logon', function () {
@@ -92,7 +95,6 @@ describe('Komfovent setter node-red', function () {
     // node should logon
     it('should logon fine given right credentials and ip', function (done) {
       const komfo = new Komfovent();
-      console.log('<<<<< : ' +credentials.password);
       komfo.logon(credentials.username, credentials.password, ip)
         .then(result => {
           result.should.have.property('error', false);
@@ -151,19 +153,22 @@ describe('Komfovent setter node-red', function () {
     });
 
     // node should not logon given wrong ip
-    it('logon should fail with error - wrongip', function (done) {
-      const komfo = new Komfovent();
-      komfo.logon(credentials.username, credentials.password, wrongIp)
-        .then(result => {
-          result.should.have.property('error', true);
-          result.result.should.startWith('Error: Unit did not respond');
-          done();
-        })
-        .catch(error => {
-          console.log('Error handling wrong ip ' + error);
+    if (timeOutTest) {
+      it('logon should fail with error - wrongip', function (done) {
+        this.timeout(0);
+        const komfo = new Komfovent();
+        komfo.logon(credentials.username, credentials.password, wrongIp)
+          .then(result => {
+            result.should.have.property('error', true);
+            result.result.should.startWith('Error: Unit did not respond');
+            done();
+          })
+          .catch(error => {
+            console.log('Error handling wrong ip ' + error);
           // console.dir(error);
-        });
-    });
+          });
+      });
+    }
     // node should fail logon with blank ip
     it('logon should fail with error - Empty ip', function (done) {
       const komfo = new Komfovent();
@@ -283,21 +288,24 @@ describe('Komfovent setter node-red', function () {
           console.dir(error);
         });
     });
-    // node should fetch an error due to wrong IP (not mocked)
-    it('should fail fetching due to wrong IP', function (done) {
-      const komfo = new Komfovent();
-      komfo.getId('ai0', wrongIp)
-        .then(result => {
-          result.should.have.property('error', true);
-          result.should.have.property('result');
-          result.result.should.startWith('Could not fetch data');
-          done();
-        })
-        .catch(error => {
-          console.log('Error fetching data: ');
-          console.dir(error);
-        });
-    });
+    // node should fetch an error due to wrong IP
+    if (timeOutTest) {
+      it('should fail fetching due to wrong IP', function (done) {
+        this.timeout(5000);
+        const komfo = new Komfovent();
+        komfo.getId('ai0', wrongIp)
+          .then(result => {
+            result.should.have.property('error', true);
+            result.should.have.property('result');
+            result.result.should.startWith('Could not fetch data');
+            done();
+          })
+          .catch(error => {
+            console.log('Error fetching data: ');
+            console.dir(error);
+          });
+      });
+    }
     // node should fetch an error due to blank ip
     it('should fail fetching due to blank IP', function (done) {
       const komfo = new Komfovent();
