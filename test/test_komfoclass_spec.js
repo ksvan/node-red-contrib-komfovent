@@ -4,11 +4,10 @@ const Komfovent = require('../komfnodes/komfovent.js');
 const should = require('should');
 const nock = require('nock');
 const Cheerio = require('cheerio');
-const ip = '192.168.1.1'; // main ip to test with
+const ip = process.env.INTEGRATION_IP || '192.168.1.1'; // main ip to test with
 const ip2 = '192.168.1.2'; // work around :( cannot make nock body matches to evaluate wrong username
 const netScope = 'http://' + ip; // Ip/scope for main test scope
 const netScope2 = 'http://' + ip2; // IP/scope for corner cases
-nock.disableNetConnect(); // do not allow tests to hit network, fail instead
 // seperat secret credentials object to be passed in at launch, adhering to how nodered protects secrets
 const credentials = { username: 'user', password: '1234' };
 const mode = { name: 'auto', code: '285=2' }; // settings object for mode change tests
@@ -20,9 +19,22 @@ const wrongIp = '192.168.2.2';
 * TODO: tests with new mocks that fails on web fetch and scraping (partial done)
 */
 
+// check if integration test
+const intTest = process.env.INTEGRATION;
+if (intTest) {
+  credentials.username = process.env.INTEGRATION_USER;
+  credentials.password = process.env.INTEGRSATION_PWD;
+  console.log('>>> RUNNING INTEGRATION TEST <<<<');
+  console.log('with user: ' + credentials.username + ' and ip: ' + ip);
+}
+else {
+  // else its unit test, mock it
+  nock.disableNetConnect(); // do not allow tests to hit network, fail instead
+}
 describe('Komfovent integration class', function () {
   before(function () {
-    // setup intercepts
+    // setup intercepts if not integration
+    if (intTest) { return; }
     // intercept search for main page
     nock(netScope)
       .persist()
@@ -54,8 +66,8 @@ describe('Komfovent integration class', function () {
     nock(netScope)
       .persist()
       .get('/failing.html')
-      .delay(200)
-      .replyWithFile(404, `${__dirname}/ajax.xml`); // TODO fix page
+      .delay(200);
+      // .replyWithFile(404, `${__dirname}/ajax.xml`); // TODO fix page
   });
 
   after(function () {
@@ -80,7 +92,7 @@ describe('Komfovent integration class', function () {
           // console.dir(error);
         });
     });
-    it('Should fail to fetch page 404', function (done) {
+    it('Should fail to fetch page - bad page', function (done) {
       const komfo = new Komfovent();
       const postConfig = {
         url: 'http://' + ip + '/failing.html',
@@ -93,11 +105,12 @@ describe('Komfovent integration class', function () {
           console.dir(result);
         })
         .catch(error => {
-          error.toString().should.endWith('404');
+          // unit should have responded 404, but it seems to only drop these request
+          error.toString().should.startWith('Error: Unit did not respond');
           done();
         });
     });
-    it('Should fail to fetch page - no response', function (done) {
+    it('Should fail to fetch page - no response bad ip', function (done) {
       const komfo = new Komfovent();
       const postConfig = {
         url: 'http://' + ip2 + '/failing.html',
