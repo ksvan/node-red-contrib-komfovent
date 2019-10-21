@@ -1,12 +1,13 @@
 module.exports = function (RED) {
   'use strict';
-  var request;
 
   // the function needed by nodered to make instances of the node
-  function komfoventNode (config) {
+  function komfoventNodeSet (config) {
     RED.nodes.createNode(this, config);
 
     // initial config of the node //
+    const KomfoClass = require('./komfovent.js');
+    const komfoInt = new KomfoClass();
     var node = this; // explicit context, this node
     node.displayName = config.displayName;
     // Retrieve the config node and validate
@@ -27,12 +28,15 @@ module.exports = function (RED) {
       node.error('Komfovent - No IP to komfovent unit found, cannot continue');
       return;
     }
+    const credentials = node.komfoUser.credentials;
     // node established
+
+    // ----- INPUT event ----
     // what to do with payload incoming ///
     node.on('input', function (msg, send, done) {
       // validate input, right mode and lookup code
-      var pay = msg.payload.toLowerCase();
-      var mode = { name: 'auto', code: '285=2' };
+      const pay = msg.payload.toLowerCase();
+      const mode = { name: 'auto', code: '285=2' };
       switch (pay) {
         case 'away':
           mode.code = node.komfoUser.mode.away;
@@ -58,43 +62,38 @@ module.exports = function (RED) {
       mode.name = pay; // mode sent as command, validated to exist now
       // logon to komfovent each time, with callback below
       node.debug('Komfovent - connecting to adress http://' + node.komfoUser.ip);
-      komfoLogon(node)
+      // logon and set unit mode
+      set(msg.payload, komfoInt, credentials, node)
         .then(result => {
-          // then are we logged on?
-          if (result.error) {
-            msg.payload = result;
-            send(msg);
-            done(result);
-          }
-          else {
-            // we are ok, go change mode
-            komfoMode(mode, node)
-              .then(result => {
-                msg.payload = result;
-                send(msg);
-                if (result.error) {
-                  done(result);
-                }
-                else {
-                  // success
-                  done();
-                }
-              })
-              .catch(error => {
-                // threw something when setting mode
-                node.error('Failed setting mode ' + JSON.stringify(error));
-                done('Failed setting mode ' + JSON.stringify(error));
-              });
-          }
+          msg.payload = result;
+          send(msg);
+          done();
         })
         .catch(error => {
-          // threw something on logon
-          node.error('failed logon' + JSON.stringify(error));
+          msg.payload = error;
+          // should not end up here with normal errors, brake the flow if so
+          done(error);
         });
     }); // this on.input end
   }
 
-  // function purely for handling logon
+  // Function to set async with logon
+  async function set (mode, komfoInt, credentials, node) {
+    try {
+      const logonResult = await komfoInt.logon(credentials.username, credentials.password, node.komfoUser.ip);
+      if (!logonResult.error) {
+        const getResult = await komfoInt.setMode(mode, node.komfoUser.ip);
+        return getResult;
+      }
+      else {
+        return logonResult;
+      }
+    }
+    catch (error) {
+      return error;
+    }
+  }
+  /* / function purely for handling logon
   async function komfoLogon (node) {
     request = require('axios');// require('request');
     let result;
@@ -167,7 +166,7 @@ module.exports = function (RED) {
       // then assuming it was ok, right http and the weird standard body response from C6 controller
       return { error: false, result: mode.name, unit: node.komfoUser.ip };
     }
-  }
+  } */
 
-  RED.nodes.registerType('komfoventNode', komfoventNode);
+  RED.nodes.registerType('komfoventNodeSet', komfoventNodeSet);
 };

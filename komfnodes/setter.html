@@ -1,5 +1,5 @@
 <script type="text/javascript">
-    RED.nodes.registerType('komfoventNode',{
+    RED.nodes.registerType('komfoventNodeSet',{
         category: 'function',
         color: '#a6bbcf',
         defaults: {
@@ -10,12 +10,12 @@
         outputs:1,
         icon: "file.png",
         label: function() {
-            return this.displayName||"komfoventNode";
+            return this.displayName||"komfoventNodeSet";
         }
     });
 </script>
 
-<script type="text/x-red" data-template-name="komfoventNode">
+<script type="text/x-red" data-template-name="komfoventNodeSet">
     <div class="form-row">
         <label for="node-input-user"><i class="icon-tag"></i> Credentials </label>
         <input type="text" id="node-input-user" placeholder="user">
@@ -26,7 +26,7 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="komfoventNode">
+<script type="text/x-red" data-help-name="komfoventNodeSet">
     <p>This nodes let you set the operating mode of the Komfovent unit with the c6 controller. The node interacts with the unit using http/ajax.</p>
     <p>msg.payload must be set to the wanted mode as string: away, home, intensive, boost, auto</p>
     <p>Node will return the mode name if success, or error otherwise</p>
