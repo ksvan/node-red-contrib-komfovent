@@ -61,7 +61,7 @@ module.exports = class Komfovent {
     const postConfig = {
       url: 'http://' + ip,
       method: 'POST',
-      body: '1=' + username + '&' + '2=' + password
+      data: '1=' + username + '&' + '2=' + password
     };
     let result;
     try {
