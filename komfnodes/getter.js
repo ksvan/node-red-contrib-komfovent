@@ -43,7 +43,7 @@ module.exports = function (RED) {
         })
         .catch(error => {
           msg.payload = error;
-          send(msg);
+          // should not end up here with normal errors, brake the flow if so
           done(error);
         });
     });// end this.on
