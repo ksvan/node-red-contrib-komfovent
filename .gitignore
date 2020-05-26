@@ -9,6 +9,7 @@ node_modules
 komfovent.code-workspace
 .stryker*
 .nyc*
+.vscode
 coverage/**
 reports/**
 reports/
