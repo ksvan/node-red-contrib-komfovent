@@ -248,8 +248,7 @@ describe('Komfovent integration class', function () {
       const komfo = new Komfovent();
       komfo.getMode(ip)
         .then(result => {
-          result.should.equal('oc-2');
-
+          result.should.have.property('result', 'oc-2');
           done();
         })
         .catch(error => {

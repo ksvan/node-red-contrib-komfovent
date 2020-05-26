@@ -130,7 +130,6 @@ module.exports = class Komfovent {
       // TODO Line below, also check 0 result in array from get(), return where we find it
       // const activeMode = msgResult.get(0).children.find(x => x.attribs['data-selected'] === '1').attribs['id'];
       const activeMode = scraped('[data-selected="1"]').attr('id');
-      console.dir(activeMode);
       if (typeof activeMode === 'undefined' || !activeMode) {
         return { error: true, result: 'Active mode not found', unit: ip };
       }

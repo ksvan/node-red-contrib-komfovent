@@ -10,6 +10,7 @@ komfovent.code-workspace
 .stryker*
 .nyc*
 .vscode
+.vscode/*
 coverage/**
 reports/**
 reports/
