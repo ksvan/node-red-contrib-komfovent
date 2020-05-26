@@ -54,7 +54,7 @@ describe('Komfovent integration class', function () {
       .persist()
       .get('/failing.html')
       .delay(200);
-      // .replyWithFile(404, `${__dirname}/ajax.xml`); // TODO fix page
+    // .replyWithFile(404, `${__dirname}/ajax.xml`); // TODO fix page
   });
 
   after(function () {
@@ -244,7 +244,6 @@ describe('Komfovent integration class', function () {
         });
     }); */
     it('should fetch active mode', function (done) {
-
       const komfo = new Komfovent();
       komfo.getMode(ip)
         .then(result => {
