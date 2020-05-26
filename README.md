@@ -23,6 +23,9 @@ or clone/download and use/modify it yourself. After download, switch to your .no
 
 You can then edit and work on it, all changes available in node-red with just a restart (node-red-stop & node-red-start)
 
+# Updating
+NB! Breaking changes from 0.3 to 0.4 due to full refactor
+
 # Nodes
 ## Config
 This node basically contains your credentials and the config values the other nodes will use for sending commands.

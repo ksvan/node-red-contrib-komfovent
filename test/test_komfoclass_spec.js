@@ -13,28 +13,15 @@ const credentials = { username: 'user', password: '1234' };
 const mode = { name: 'auto', code: '285=2' }; // settings object for mode change tests
 const badMode = { name: 'autoish', code: '2567=234' }; // settings object for mode change tests
 const wrongIp = '192.168.2.2';
+nock.disableNetConnect(); // do not allow tests to hit network, fail instead
 /*
 * * mocked testing of spec only.
 * TODO: duplicate without mocking as integration test (allow connection, no mocking, real ip)
 * TODO: tests with new mocks that fails on web fetch and scraping (partial done)
 */
 
-// check if integration test
-const intTest = process.env.INTEGRATION;
-if (intTest) {
-  credentials.username = process.env.INTEGRATION_USER;
-  credentials.password = process.env.INTEGRSATION_PWD;
-  console.log('>>> RUNNING INTEGRATION TEST <<<<');
-  console.log('with user: ' + credentials.username + ' and ip: ' + ip);
-}
-else {
-  // else its unit test, mock it
-  nock.disableNetConnect(); // do not allow tests to hit network, fail instead
-}
 describe('Komfovent integration class', function () {
   before(function () {
-    // setup intercepts if not integration
-    if (intTest) { return; }
     // intercept search for main page
     nock(netScope)
       .persist()
@@ -261,7 +248,8 @@ describe('Komfovent integration class', function () {
       const komfo = new Komfovent();
       komfo.getMode(ip)
         .then(result => {
-          // TODO FIX in komfoclass, cherio query to detect console.log('>>>>> ' + JSON.stringify(result));
+          result.should.equal('oc-2');
+
           done();
         })
         .catch(error => {

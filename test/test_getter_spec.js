@@ -68,7 +68,6 @@ describe('Komfovent getter node-red', function () {
   ];
   // separat secret credentials object to be passed in at launch, adhering to how nodered protects secrets
   const credentials = { nc: { username: 'user', password: '1234' } };
-
   describe('Node load with config', function () {
   // node should be loaded fine in the runtime
     it('should be loaded', function (done) {

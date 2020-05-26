@@ -47,13 +47,15 @@ describe('Komfovent setter node-red', function () {
 
   after(function (done) {
     nock.cleanAll();
-    helper.stopServer(done);
+    helper.unload().then(function () {
+      helper.stopServer(done);
+    });
   });
 
   // the way node-red defines flows and relations between nodes, and sets their initial values
   const flow = [
     { id: 'nc', type: 'komfoventConfig', ip: ip, displayName: 'Komfovent Site', z: 'f1' },
-    { id: 'n1', type: 'komfoventNode', displayName: 'Komfo set Data', user: 'nc', wires: [['nh']], z: 'f1' },
+    { id: 'n1', type: 'komfoventNodeSet', displayName: 'Komfo set Data', user: 'nc', wires: [['nh']], z: 'f1' },
     { id: 'nh', type: 'helper', z: 'f1' },
     { id: 'f1', type: 'tab', label: 'Test flow' }
   ];

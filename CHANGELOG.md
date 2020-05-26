@@ -30,10 +30,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.4.0]
 
 ### Addedd
-- Simple unit testing w mocking
+- Unit testing w mocking
+- Simple mutatation testing
+- Shared integration module, class for integration with Komfovent. Separate from Nodered code
 
 ### Changed
 - NB! Breaking changes in v 0.4 with regards to nodered version and dependencies
+- NB! Breaking changes, new name and structure on node to set modes
+- Full refactor of nodes to use shared module
 - Dependencies update, incl devdep. Now switched Request with Axio for http
 - Updates for node >1.x. Breaking changes for nodered installs <1.0. Specifically for error handling and sending
 - Refactored logon and mode functions to axio and async/await/then pattern, from callback

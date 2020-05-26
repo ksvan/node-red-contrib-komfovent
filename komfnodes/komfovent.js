@@ -114,7 +114,7 @@ module.exports = class Komfovent {
       return { error: false, result: mode.name };
     }
     else {
-      return { error: true, result: 'Could not set mode. Non existing? ' + mode.name , unit: ip};
+      return { error: true, result: 'Could not set mode. Non existing? ' + mode.name, unit: ip };
     }
   } // setmode end
 
@@ -127,14 +127,16 @@ module.exports = class Komfovent {
     // no validate input, private
     try {
       const scraped = await this.getData('data', ip);
-      const msgResult = scraped('div[data-selected="1"]').innerText();// ('div.control-1'); // .attr('data-selected');
-      console.dir(msgResult);
-      if (typeof msgResult === 'undefined' || !msgResult) {
+      // TODO Line below, also check 0 result in array from get(), return where we find it
+      // const activeMode = msgResult.get(0).children.find(x => x.attribs['data-selected'] === '1').attribs['id'];
+      const activeMode = scraped('[data-selected="1"]').attr('id');
+      console.dir(activeMode);
+      if (typeof activeMode === 'undefined' || !activeMode) {
         return { error: true, result: 'Active mode not found', unit: ip };
       }
       else {
         // seems like we got the data without errors
-        return { error: false, result: msgResult, unit: ip };
+        return { error: false, result: activeMode, unit: ip };
       }
     }
     catch (error) {

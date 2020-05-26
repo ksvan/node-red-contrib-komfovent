@@ -28,7 +28,7 @@ Komfovent built in webserver for controller C6.
 	request.post({
       url: 'http://' + node.komfoUser.ip,
       headers: { 'Content-Length': 17 },
-      body: '1=' + node.komfoUser.credentials.username + '&' + '2=' + node.komfoUser.credentials.password
+      body: '1=' + credentials.username + '&' + '2=' + credentials.password
     },
 
 Komfovent seems to require Host to be present.
@@ -154,4 +154,4 @@ om-x fields are shown with a property data-selected="1" is currently active, but
 oc-x fields are shown with the same property if selected, but also set to 0 if not active.
 
 ## HTTP
-Det device has a built in webserver. This does not seem to return anything but 200 OK, even if wrong password, wrong input data in POST etc.
+Det device has a built in webserver. This does not seem to return anything but 200 OK, even if wrong password, wrong input data in POST etc. But, if asking for a non-existing folder, it serves default index.html. If asked for a non-existing .html pages however, the connection is dropped, not served with a 404.

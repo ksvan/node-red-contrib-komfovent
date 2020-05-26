@@ -11,8 +11,10 @@ const mode = { name: 'auto', code: '285=2' }; // settings object for mode change
 const badMode = { name: 'autoish', code: '2567=234' }; // settings object for mode change tests
 
 /*
-* * Integration test with Comfovent c6 controller
-* pretty much the same as unit test, but tests on bad ip's not included (doesnt resolve/reject before after system tcp init timeout, 75s on mac)
+* * Integration test with Comfovent c6 controller, for komfovent class standalone
+* pretty much the same as unit test, but tests on bad ip's not included by default (doesnt resolve/reject before after system tcp 
+* init timeout, 75s on mac). Can still be configured with env var
+* TODO: Add regex validation of fetched values, since they cannot be static set with a live system
 */
 
 // check if integration test
@@ -24,7 +26,7 @@ credentials.password = process.env.INTEGRATION_PWD || ''; // real password, int_
 console.log('>>> RUNNING INTEGRATION TEST <<<<');
 console.log('with user: ' + credentials.username + ' and ip: ' + ip);
 
-describe('Komfovent setter node-red', function () {
+describe('Integration: Komfovent setter node-red', function () {
   describe('Komfovent class - makeRequest', function () {
     it('Should fetch page fine', function (done) {
       const komfo = new Komfovent();
@@ -215,11 +217,10 @@ describe('Komfovent setter node-red', function () {
         });
     }); */
     it('should fetch active mode', function (done) {
-
       const komfo = new Komfovent();
       komfo.getMode(ip)
         .then(result => {
-          // TODO FIX in komfoclass, cherio query to detect console.log('>>>>> ' + JSON.stringify(result));
+          result.should.be('oc-2');
           done();
         })
         .catch(error => {
