@@ -220,7 +220,7 @@ describe('Integration: Komfovent setter node-red', function () {
       const komfo = new Komfovent();
       komfo.getMode(ip)
         .then(result => {
-          result.should.be('oc-2');
+          result.should.have.property('result', 'oc-2');
           done();
         })
         .catch(error => {

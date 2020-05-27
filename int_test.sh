@@ -3,7 +3,7 @@ export INTEGRATION="true"
 export INTEGRATION_USER="user"
 export INTEGRATION_IP="192.168.1.234"
 
-if [[ -z "$INTEGRATION_PWD" ]]
+if [[ -n "$INTEGRATION_PWD" ]]
 then
     echo "Password is set"
 else
