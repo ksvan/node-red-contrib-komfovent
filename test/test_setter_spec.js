@@ -122,4 +122,24 @@ describe('Komfovent setter node-red', function () {
       });
     }); // it end
   });
+
+  describe('Node fetching current mode', function () {
+  // Node should reply with changed mode
+    it('should return current mode', function (done) {
+      // this.timeout(5000);
+      helper.load([komfoSetNode, komfoConfNode], flow, credentials, function () {
+        const n1 = helper.getNode('n1');
+        const nh = helper.getNode('nh');
+        nh.on('input', msg => {
+          msg.payload.should.have.property('error', false);
+          msg.payload.should.have.property('result', 'auto');
+          done();
+        });
+        n1.on('call:error', call => {
+          console.log('error: ' + call);
+        });
+        n1.receive({ payload: 'auto' }); //  existing mode
+      });
+    }); // it end
+  });
 });

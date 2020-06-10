@@ -7,7 +7,6 @@ const Cheerio = require('cheerio');
 const ip = '192.168.1.234';
 const netscope = 'http://' + ip;
 
-
 /* manual integration test
 * * meant for diverse reverse engineering testing along the way
 * not part of unit, integration test or build
@@ -21,7 +20,6 @@ const netscope = 'http://' + ip;
 nock.disableNetConnect(); */
 
 it('Manual: should fetch active mode', function (done) {
-
   const komfo = new Komfovent();
   komfo.getMode(ip)
     .then(result => {

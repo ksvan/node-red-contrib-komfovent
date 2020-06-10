@@ -8,26 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Addedd
 
 - Supporting more specific fan modes with timeouts
-- Screen scraping support datafields from the other pages as well (those in iframes on the main page)
 - screen scraping, specifically figure out which settings are enabled/disabled
 - config of setter node, to be a predefined action on any input. simplfy use in flows
-- add unit/integration tests
 - add separate node for toggle handling (auto and eco mode)
 
 ### Changed
-- Moving to promises requests, async awaits for better readability. away from old call back pattern
 - validate logon better, by parsing returned body
 - screen scraping, remove data unit definiton from returns, ie % C etc
-- move duplicated code into separate modules (komfologon, scraping). Also make it easier to use komfovent logic outside of nodered
 - look into moving error/warnings up in the call stack, passed from sub functions to nodered now. Maybe not needed anymore, enough info flowing up
-- with regards to that, refactor with shared komfovent lib, fully runtime agnostic
 
 ### Fix
 - displayName issue for configuration nodes
 - moving error msgs to shared constants
 
 
-## [0.4.0]
+## [0.4.0-rc1]
+RC1 release - full refactor and several bigger updates, requires more testing. 
 
 ### Addedd
 - Unit testing w mocking
@@ -41,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dependencies update, incl devdep. Now switched Request with Axio for http
 - Updates for node >1.x. Breaking changes for nodered installs <1.0. Specifically for error handling and sending
 - Refactored logon and mode functions to axio and async/await/then pattern, from callback
+- moving from Greenkeeper to snyk.io
 
 ### Fixed
 - consistency in logging categories, warn vs error

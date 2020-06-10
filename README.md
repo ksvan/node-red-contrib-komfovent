@@ -1,7 +1,7 @@
 
 # Node-red-contrib-komfovent
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/ksvan/node-red-contrib-komfovent.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.com/ksvan/node-red-contrib-komfovent.svg?branch=master)](https://travis-ci.com)
 
 This package contains nodes to work with Komfovent ventilation units, mainly with the C6 controller with built-in webserver.
@@ -24,7 +24,8 @@ or clone/download and use/modify it yourself. After download, switch to your .no
 You can then edit and work on it, all changes available in node-red with just a restart (node-red-stop & node-red-start)
 
 # Updating
-NB! Breaking changes from 0.3 to 0.4 due to full refactor
+NB! Breaking changes from 0.3 to 0.4 due to full refactor, new Node-red versions etc.
+
 
 # Nodes
 ## Config
@@ -42,8 +43,9 @@ This is the first action node, that will let you activate the different modes of
 
 Please note that in the C6 webcontroller, the Auto and Eco modes are toggle switches. If you call it once, auto mode is activated. Twice, and it falls back to last known standard mode (away, normal etc). If nodes are used for automating based on events from other system, you should handle this state with other nodes.
 
+
 ### Input and results 
-The node takes strings as input, the name of the wanted operating mode.
+The node takes strings as input, the name of the wanted operating mode or blank ('') to fetch current mode, without changing it.
 	
 	msg.payload = 'intensive';
 
@@ -51,7 +53,8 @@ Return values are either the mode if success, or errorobject if error. The error
 
 	{ error: true, result: 'wrong password', unit: 192.168.x.x }
 	{ error: false, result: 'auto', unit: 192.168.x.x }
-	{ error: false, result: '16.6', unit: 192.168.x.x } 
+	{ error: true, result: 'Unsupported mode', unit: 192.168.x.x } 
+	
 
 Result can also be stringified error object from Request.post, on errors not handled specifically by this node.
 
@@ -73,6 +76,7 @@ Errors are printed to the log, and simple error objects returned. Normal return 
 ### Field names
 These are case sensitive
 
+
 #### Temperature and environment
 - ai0 is supply temperature
 - ai1 is extract temperature
@@ -89,13 +93,14 @@ These are case sensitive
 - ec7d is kWh spent on heating for current day. ec7m is for month and ec7t total
 - v_eh is heater operating level
 
-#### System metrics
+#### System metrics and status
 - fcg is filter clogging level %
 - ec3 is current power consumption
 - ec8d is recovered energy in kWh current day. ec8m for month, ec8t total
 - ec6d is consumed energy in kWh for the day. ec6m for month and ec6t for total
 - v_ad is air dampers %
 - v_es is energy saving level
+- omo is current fan mode 
 
 #### Pressure
 - saf is suppy flow in percentage
@@ -134,7 +139,7 @@ Please not that the units c6 controller does not support SSL/TLS. Do make sure t
 # Komfovent class
 Foundational module for all nodes, Komfoventclass. Contains functions for get/set modes, get data. 
 - getMode(ip)
-- setMode(mode, name) where mode is {name: 'auto|away|etc, code:'285=2'}
+- setMode(mode, ip) where mode is {name: 'auto|away|etc, code:'285=2'}
 - getId(id, ip) where id is the name of datafield to fetch
 - logon(username,password,ip)
 

@@ -51,6 +51,9 @@ module.exports = function (RED) {
         case 'auto':
           mode.code = node.komfoUser.mode.auto;
           break;
+        case '':
+          // blanks, fetch current status instead
+          break;
         default:
           node.warn('Komfovent - unsupported mode');
           msg.payload = { error: true, result: 'Unsupported mode', unit: node.komfoUser.ip };
@@ -79,8 +82,14 @@ module.exports = function (RED) {
   async function set (mode, komfoInt, credentials, node) {
     try {
       const logonResult = await komfoInt.logon(credentials.username, credentials.password, node.komfoUser.ip);
-      if (!logonResult.error) {
+      if (!logonResult.error && mode.name !== '') {
+        // if mode is given, set it
         const getResult = await komfoInt.setMode(mode, node.komfoUser.ip);
+        return getResult;
+      }
+      else if (!logonResult.error && mode.name === '') {
+        // if mode is not given, fetch current
+        const getResult = await komfoInt.getMode(node.komfoUser.ip);
         return getResult;
       }
       else {

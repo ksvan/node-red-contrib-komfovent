@@ -119,18 +119,16 @@ module.exports = class Komfovent {
   } // setmode end
 
   /* private getMode()
-  * * Function to fetch currently active mode
-  * TODO fix attrib scan from scraper and find text value of active mode
+  * * Function to fetch currently active mode, easiest from the C6 controller page i.asp
   * @param ip ip of the unit to fetch mode status from
   */
   async getMode (ip) {
     // no validate input, private
     try {
-      const scraped = await this.getData('data', ip);
-      // TODO Line below, also check 0 result in array from get(), return where we find it
-      // const activeMode = msgResult.get(0).children.find(x => x.attribs['data-selected'] === '1').attribs['id'];
-      const activeMode = scraped('[data-selected="1"]').attr('id');
+      const scraped = await this.getData('i.asp', ip); // fetch the page and get the scraping selector.
+      const activeMode = scraped('omo').text().trim();
       if (typeof activeMode === 'undefined' || !activeMode) {
+        // return error not found
         return { error: true, result: 'Active mode not found', unit: ip };
       }
       else {
@@ -146,14 +144,12 @@ module.exports = class Komfovent {
   /* private getData()
   * * private function to fetch data from the different komfovent views
   * TODO
-  * @param name Name of the datafield to fetch. IDs defined in C6 web setup, documented in README and reverse.md
+  * @param page Name of the page to fetch. or blank for default
   * @param ip IP address of the unit to fetch from
   * @return cherio object for query of scraped content
   */
-  async getData (name, ip) {
+  async getData (page, ip) {
     // no validate input, private only
-    // change target to subpage if identity/name
-    const page = name.indexOf('_') > 0 ? 'det.html' : '';
     // setup for get request
     const getConfig = {
       url: 'http://' + ip + '/' + page,
@@ -187,7 +183,9 @@ module.exports = class Komfovent {
       return ({ error: true, result: 'Empty IP recieved, quitting', unit: ip });
     }
     try {
-      const scraped = await this.getData(name, ip);
+      // change target to subpage if identity/name
+      const page = name.indexOf('_') > 0 ? 'det.html' : '';
+      const scraped = await this.getData(page, ip);
       const msgResult = scraped('#' + name).text().trim();
       if (typeof msgResult === 'undefined' || !msgResult) {
         return { error: true, result: 'ID not found', unit: ip };

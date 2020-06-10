@@ -49,7 +49,13 @@ describe('Komfovent integration class', function () {
       .post('/ajax.xml')
       .delay(500)
       .replyWithFile(200, `${__dirname}/ajax.xml`);
-    // intercept ajax commands ffor failing pages
+    // intercept data fetches for modes
+    nock(netScope)
+      .persist()
+      .get('/i.asp')
+      .delay(500)
+      .replyWithFile(200, `${__dirname}/i.asp`);
+    // intercept ajax commands for failing pages
     nock(netScope)
       .persist()
       .get('/failing.html')
@@ -247,7 +253,9 @@ describe('Komfovent integration class', function () {
       const komfo = new Komfovent();
       komfo.getMode(ip)
         .then(result => {
-          result.should.have.property('result', 'oc-2');
+          result.should.have.property('result');
+          result.should.not.have.property('result', 'Active mode not found');
+          result.should.not.have.property('error', true);
           done();
         })
         .catch(error => {

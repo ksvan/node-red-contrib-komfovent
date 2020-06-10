@@ -153,5 +153,10 @@ so-x fields are shown with a property data-selected="1" is currently active, but
 om-x fields are shown with a property data-selected="1" is currently active, but no property if not active.
 oc-x fields are shown with the same property if selected, but also set to 0 if not active.
 
+### Specifics on scraping modes
+In the master webpages, modes selected are highlighted with the addition of attribute data-selected=1. But, the changes in this attribute seems to be clientside javascript, not on initial load of the page. There is javascript functions that will remove and place this attribute as needed. And this doesnt work so good with a scraper like Cheerio. Hence, another way around it was needed.
+
+The formerly mentioned i.asp page has an initial element called <omo>, which contains the human readable name of the current mode. Cheerio works fine with scraping a semi xml page like this. Normal, Away, Intense, Auto etc
+
 ## HTTP
 Det device has a built in webserver. This does not seem to return anything but 200 OK, even if wrong password, wrong input data in POST etc. But, if asking for a non-existing folder, it serves default index.html. If asked for a non-existing .html pages however, the connection is dropped, not served with a 404.

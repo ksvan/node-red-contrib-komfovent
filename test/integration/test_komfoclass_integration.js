@@ -216,11 +216,15 @@ describe('Integration: Komfovent setter node-red', function () {
           console.dir(error);
         });
     }); */
+
+    
     it('should fetch active mode', function (done) {
       const komfo = new Komfovent();
       komfo.getMode(ip)
         .then(result => {
-          result.should.have.property('result', 'oc-2');
+          result.should.have.property('result');
+          result.should.not.have.property('result', 'Active mode not found');
+          result.should.not.have.property('error', true);
           done();
         })
         .catch(error => {

@@ -29,5 +29,7 @@
 <script type="text/x-red" data-help-name="komfoventNodeSet">
     <p>This nodes let you set the operating mode of the Komfovent unit with the c6 controller. The node interacts with the unit using http/ajax.</p>
     <p>msg.payload must be set to the wanted mode as string: away, home, intensive, boost, auto</p>
+    <p>If payload is blank, the node will return the current active mode</p>
     <p>Node will return the mode name if success, or error otherwise</p>
+    <p> {"error":false,"result":"INTENSIVE","unit":"192.168.1.xxx"} </p>
 </script>
