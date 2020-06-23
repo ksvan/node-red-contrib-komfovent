@@ -38,6 +38,7 @@ RC1 release - full refactor and several bigger updates, requires more testing.
 - Updates for node >1.x. Breaking changes for nodered installs <1.0. Specifically for error handling and sending
 - Refactored logon and mode functions to axio and async/await/then pattern, from callback
 - moving from Greenkeeper to snyk.io
+- pulled offical support for Nodejs 8
 
 ### Fixed
 - consistency in logging categories, warn vs error
