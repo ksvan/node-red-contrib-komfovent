@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 'use strict';
-const should = require('should');
+// const should = require('should');
 const nock = require('nock');
 const helper = require('node-red-node-test-helper');
 const komfoSetNode = require('../komfnodes/setter.js');
@@ -8,7 +8,7 @@ const komfoConfNode = require('../komfnodes/config.js');
 
 const netScope = 'http://192.168.1.1';
 const ip = '192.168.1.1';
-const ip2 = '192.168.2.1';
+// const ip2 = '192.168.2.1';
 
 helper.init(require.resolve('node-red'));
 nock.disableNetConnect();

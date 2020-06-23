@@ -6,7 +6,7 @@
 * TODO: same setup without mocking for actuall integration test
 */
 'use strict';
-const should = require('should');
+// const should = require('should');
 const nock = require('nock');
 const helper = require('node-red-node-test-helper');
 const komfoGetNode = require('../komfnodes/getter.js');

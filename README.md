@@ -32,7 +32,7 @@ NB! Breaking changes from 0.3 to 0.4 due to full refactor, new Node-red versions
 This node basically contains your credentials and the config values the other nodes will use for sending commands.
 the values Komfovent accepts for the different modes are stored here, as of now not available from config.
 
-## KomfoventNode (set mode)
+## KomfoventNodeSet (set mode)
 This is the first action node, that will let you activate the different modes of the unit.
 
 	Auto - The unit will either follow the chosen program (workweek etc) or manage speed based on sensors if installed (humidity, temp)
@@ -55,7 +55,7 @@ Return values are either the mode if success, or errorobject if error. The error
 	{ error: false, result: 'auto', unit: 192.168.x.x }
 	{ error: true, result: 'Unsupported mode', unit: 192.168.x.x } 
 	
-
+Note that the returned mode is what was passed to the node, not an actual return from the C6 controller confirming mode. Fetch updated mode to verify this. 
 Result can also be stringified error object from Request.post, on errors not handled specifically by this node.
 
 ## KomfoventNodeGet (get data)

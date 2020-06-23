@@ -1,7 +1,7 @@
 /* eslint-env mocha */
 'use strict';
 const Komfovent = require('../../komfnodes/komfovent.js');
-const should = require('should');
+// const should = require('should');
 const Cheerio = require('cheerio');
 const ip = process.env.INTEGRATION_IP || '192.168.1.1'; // main ip to test with
 const wrongIp = '192.168.2.2'; // should be outside of local net, not working
@@ -18,7 +18,7 @@ const badMode = { name: 'autoish', code: '2567=234' }; // settings object for mo
 */
 
 // check if integration test
-const intTest = process.env.INTEGRATION; // true
+// const intTest = process.env.INTEGRATION; // true
 const timeOutTest = process.env.INTEGRATION_TIMEOUT || false;// true, blank
 credentials.username = process.env.INTEGRATION_USER || 'user'; // username, blank for default 
 credentials.password = process.env.INTEGRATION_PWD || ''; // real password, int_test.sh will ask
@@ -187,7 +187,7 @@ describe('Integration: Komfovent setter node-red', function () {
     });
   });
 
-  // node should switch mode 
+  // node should switch mode
   describe('Setting and getting modes', function () {
     it('should set mode', function (done) {
       const komfo = new Komfovent();
@@ -216,8 +216,6 @@ describe('Integration: Komfovent setter node-red', function () {
           console.dir(error);
         });
     }); */
-
-    
     it('should fetch active mode', function (done) {
       const komfo = new Komfovent();
       komfo.getMode(ip)

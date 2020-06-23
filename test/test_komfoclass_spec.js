@@ -1,7 +1,7 @@
 /* eslint-env mocha */
 'use strict';
 const Komfovent = require('../komfnodes/komfovent.js');
-const should = require('should');
+// const should = require('should');
 const nock = require('nock');
 const Cheerio = require('cheerio');
 const ip = process.env.INTEGRATION_IP || '192.168.1.1'; // main ip to test with
