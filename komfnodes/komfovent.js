@@ -114,7 +114,7 @@ module.exports = class Komfovent {
       return { error: false, result: mode.name };
     }
     else {
-      return { error: true, result: 'Could not set mode. Non existing? ' + mode.name , unit: ip};
+      return { error: true, result: 'Could not set mode. Non existing? ' + mode.name, unit: ip };
     }
   } // setmode end
 
