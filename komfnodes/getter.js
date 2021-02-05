@@ -6,7 +6,7 @@ module.exports = function (RED) {
     const komfoInt = new KomfoClass();
     RED.nodes.createNode(this, config);
     // initial config of the node  ///
-    var node = this;
+    const node = this;
     this.displayName = config.displayName;
     // Retrieve the config node and validate setup of node
     try {

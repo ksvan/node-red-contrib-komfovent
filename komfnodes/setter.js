@@ -8,7 +8,7 @@ module.exports = function (RED) {
     // initial config of the node //
     const KomfoClass = require('./komfovent.js');
     const komfoInt = new KomfoClass();
-    var node = this; // explicit context, this node
+    const node = this; // explicit context, this node
     node.displayName = config.displayName;
     // Retrieve the config node and validate
     try {
