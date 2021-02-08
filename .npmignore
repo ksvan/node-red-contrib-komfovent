@@ -1,0 +1,15 @@
+.vscode/
+lib/
+test
+.config*
+.eslintrc.js
+.flows.json.backup
+.gitignore
+.travis.yml
+flows_cred.json
+flows.json
+int_test.sh
+komfovent.code-workspace
+NOTES.md
+reverse.md
+stryker.conf.js
