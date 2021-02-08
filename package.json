@@ -7,8 +7,7 @@
   "dependencies": {
     "cheerio": ">=1.0.0-rc.5",
     "node-red": "^1.2.9",
-    "request": ">=2.88.0",
-    "stryker-mocha-runner": "^0.17.1"
+    "request": ">=2.88.0"
   },
   "keywords": [
     "komfovent",
@@ -47,7 +46,8 @@
     "nock": "^13.0.7",
     "node-red-node-test-helper": "^0.2.6",
     "nyc": "^15.1.0",
-    "should": "^13.2.3"
+    "should": "^13.2.3",
+    "stryker-mocha-runner": "^0.17.1"
   },
   "scripts": {
     "pretest": "eslint komfnodes/*.js",
