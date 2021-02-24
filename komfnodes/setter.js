@@ -63,7 +63,7 @@ module.exports = function (RED) {
       // logon to komfovent each time, with callback below
       node.debug('Komfovent - connecting to adress http://' + node.komfoUser.ip);
       // logon and set unit mode
-      set(msg.payload, komfoInt, credentials, node)
+      set(mode, komfoInt, credentials, node)
         .then(result => {
           msg.payload = result;
           send(msg);
