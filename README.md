@@ -1,7 +1,7 @@
 
 # Node-red-contrib-komfovent
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/ksvan/node-red-contrib-komfovent.svg)](https://greenkeeper.io/)
+[![Known Vulnerabilities](https://snyk.io/test/github/ksvan/node-red-contrib-komfovent/badge.svg)](https://snyk.io/test/github/ksvan/node-red-contrib-komfovent)
 [![Build Status](https://travis-ci.com/ksvan/node-red-contrib-komfovent.svg?branch=master)](https://travis-ci.com)
 
 This package contains nodes to work with Komfovent ventilation units, mainly with the C6 controller with built-in webserver.
