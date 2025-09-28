@@ -1,0 +1,8 @@
+# <type>(scope)!: Kort, presis tittel (≤ 50 tegn)
+#
+# WHY:
+# WHAT:
+# HOW:
+#
+# BREAKING CHANGE:
+# Related: #123
