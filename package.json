@@ -5,9 +5,9 @@
   "author": "Kristian Svantorp",
   "license": "MIT",
   "dependencies": {
+    "axios": ">=1.12.0",
     "cheerio": ">=1.0.0",
-    "node-red": "^4.0.9",
-    "request": ">=2.88.2"
+    "node-red": "^4.0.9"
   },
   "keywords": [
     "komfovent",
@@ -27,18 +27,15 @@
     "url": "https://github.com/ksvan/node-red-contrib-komfovent.git"
   },
   "devDependencies": {
+    "@eslint/js": "^9.36.0",
+    "@eslint/json": "^0.13.2",
     "@stryker-mutator/core": ">=9.0.0",
     "@stryker-mutator/javascript-mutator": ">=4.0.0",
     "@stryker-mutator/mocha-runner": ">=9.0.0",
     "ajv": "^6.10.2",
-    "axios": "^1.12.2",
-    "eslint": ">=7.32.0",
-    "eslint-plugin-import": ">=2.18.2",
-    "eslint-plugin-json": ">=1.4.0",
-    "eslint-plugin-mocha": ">=6.2.0",
-    "eslint-plugin-node": ">=11.0.0",
-    "eslint-plugin-promise": ">=4.2.1",
-    "eslint-plugin-standard-recommended": ">=2.0.1",
+    "axios": ">=1.12.0",
+    "eslint": "^9.36.0",
+    "globals": "^16.4.0",
     "mocha": ">=6.2.1",
     "nock": ">=11.4.0",
     "node-red-node-test-helper": ">=0.3.0",

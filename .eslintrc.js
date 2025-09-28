@@ -4,8 +4,9 @@ module.exports = {
         "semi": [2, "always"],
         "brace-style": [2, "stroustrup", { "allowSingleLine": true }]
     },
-    "plugins": [
-    "mocha"
-  ]
+    "plugins": [ "mocha"],
+    "env": {
+        "node": true  
+    } 
 
 };
