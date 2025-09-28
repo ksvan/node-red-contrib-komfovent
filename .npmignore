@@ -1,0 +1,7 @@
+*debug*
+*Sample*
+tests/*
+.eslintrc*
+.travis.yml
+*sublime*
+.DS*
